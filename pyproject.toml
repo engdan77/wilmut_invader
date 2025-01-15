@@ -1,0 +1,16 @@
+[project]
+name = "wilmut-invader"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pygame>=2.6.1",
+]
+
+[project.scripts]
+wilmut-invader = "wilmut_invader:main.start"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

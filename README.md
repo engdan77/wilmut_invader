@@ -1,2 +1,3 @@
-# wilmut_invader
-👾 .. a fun game developed ..
+# 👾 Wilmut Invader
+
+_Work in progress_
