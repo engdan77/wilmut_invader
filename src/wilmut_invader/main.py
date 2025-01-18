@@ -12,8 +12,10 @@ def py2to3(code):
     output_lines = []
     lines = code.split('\n')
     for line in lines:
+        if 'import asyncio' in line:
+            continue
         if 'await asyncio.sleep(0)' in line:
-            line = line.replace('await asyncio.sleep(0)', '')
+            continue
         if 'async def' in line:
             line = line.replace('async def', 'def')
         if 'await ' in line:
