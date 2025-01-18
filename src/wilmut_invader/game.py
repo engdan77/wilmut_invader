@@ -5,9 +5,11 @@
 # ]
 # ///
 import asyncio
-
+import sys
 import pygame
 import random
+
+PY2 = int(sys.version.split('.').pop(0)) == 2
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -22,7 +24,10 @@ class Block(pygame.sprite.Sprite):
     """ This class represents the block. """
 
     def __init__(self, color):
-        super().__init__()
+        if PY2:
+            super(Block, self).__init__()
+        else:
+            super().__init__()
 
         self.image = pygame.Surface([20, 15])
         self.image.fill(color)
@@ -34,7 +39,10 @@ class Player(pygame.sprite.Sprite):
     """ This class represents the Player. """
 
     def __init__(self):
-        super().__init__()
+        if PY2:
+            super(Player, self).__init__()
+        else:
+            super().__init__()
         self.change_x = 0
         self.image = pygame.Surface([20, 20])
         self.image.fill(RED)
@@ -63,7 +71,10 @@ class Bullet(pygame.sprite.Sprite):
     """ This class represents the bullet . """
 
     def __init__(self):
-        super().__init__()
+        if PY2:
+            super(Bullet, self).__init__()
+        else:
+            super().__init__()
         self.image = pygame.Surface([4, 10])
         self.image.fill(BLACK)
         self.rect = self.image.get_rect()
