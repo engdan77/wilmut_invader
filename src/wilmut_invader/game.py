@@ -100,18 +100,15 @@ def load_images():
 
 
 def load_sfx():
-    pygame.mixer.pre_init(44100, 16, 2, 4096)
-    pygame.init()
+    # pygame.mixer.pre_init(44100, 16, 2, 4096)
+    pygame.mixer.init()
     global SFX_SHOT
     SFX_SHOT = pygame.mixer.Sound("sfx/fart.ogg")
 
 
 async def game_loop():
+    pygame.init()
     load_sfx()
-    pygame.init()
-
-    # Initialize Pygame
-    pygame.init()
 
     screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
 
