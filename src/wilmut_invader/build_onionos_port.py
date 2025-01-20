@@ -83,7 +83,7 @@ def create_shortcut(
     target_dir: Path, game_name: str, main_python_file: str = 'main.py'
 ):
     name = normalize_name(game_name)
-    shortcuts_dir = Path(target_dir / 'Roms/PORTS/Shortcuts/Actions').expanduser()
+    shortcuts_dir = Path(target_dir / 'Roms/PORTS/Shortcuts/Action').expanduser()
     shortcuts_dir.mkdir(parents=True, exist_ok=True)
     shortcut_file = shortcuts_dir / f'{name}.notfound'
     data = string.Template(SHORTCUT_TEMPLATE).substitute(
@@ -91,7 +91,6 @@ def create_shortcut(
         normalized_name=normalize_name(game_name),
         main_python_file=main_python_file,
     )
-    print(f'Writing: {data}')
     shortcut_file.write_text(data)
 
 
@@ -114,10 +113,15 @@ def build_port(
     ),
 ):
     """Build a OnionOS port of this game"""
+    print('Copying source code')
     copy_source_files(source_files_path, target_dir, game_name=game_name)
+    print('Copying image')
     copy_img(target_dir, image_file, game_name)
+    print('Creating manual from README')
     create_manual(target_dir, readme_file, game_name)
+    print('Building shortcut file')
     create_shortcut(target_dir, game_name, main_python_file)
+    print(f'All written to {target_dir.as_posix()}')
 
 
 if __name__ == '__main__':
