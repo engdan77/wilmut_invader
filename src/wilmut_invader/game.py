@@ -19,6 +19,9 @@ BLUE = (0, 0, 255)
 SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 480
 
+IMG_WILMA = None
+IMG_SLIME = None
+
 
 class Block(pygame.sprite.Sprite):
     """ This class represents the block. """
@@ -44,8 +47,10 @@ class Player(pygame.sprite.Sprite):
         else:
             super().__init__()
         self.change_x = 0
-        self.image = pygame.Surface([20, 20])
-        self.image.fill(RED)
+        # self.image = pygame.Surface([20, 20])
+        # self.image.fill(RED)
+        self.image = IMG_WILMA
+        self.image.set_colorkey((0, 0, 0, 255))
         self.rect = self.image.get_rect()
 
     def update(self):
@@ -58,7 +63,6 @@ class Player(pygame.sprite.Sprite):
         if self.rect.x <= left_side - self.rect.width:
             print(self.rect.x)
             self.change_x = 0
-            # self.rect.x = SCREEN_WIDTH
 
     def go_left(self):
         self.change_x = -4
@@ -75,12 +79,22 @@ class Bullet(pygame.sprite.Sprite):
             super(Bullet, self).__init__()
         else:
             super().__init__()
-        self.image = pygame.Surface([4, 10])
-        self.image.fill(BLACK)
+        # self.image = pygame.Surface([4, 10])
+        # self.image.fill(BLACK)
+        self.image = IMG_SLIME
+        self.image.set_colorkey((0, 0, 0, 255))
         self.rect = self.image.get_rect()
 
     def update(self):
         self.rect.y -= 3
+
+
+def load_images():
+    """Load images into global scope to avoid load and less performance"""
+    global IMG_WILMA
+    global IMG_SLIME
+    IMG_WILMA = pygame.image.load('img/wilma.png').convert()
+    IMG_SLIME = pygame.image.load('img/slimeshot.png').convert()
 
 
 async def game_loop():
@@ -88,6 +102,8 @@ async def game_loop():
     pygame.init()
 
     screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
+
+    load_images()
 
     # This is a list of every sprite. All blocks and the player block as well.
     all_sprites_list = pygame.sprite.Group()
@@ -116,7 +132,7 @@ async def game_loop():
     done = False
     clock = pygame.time.Clock()
     score = 0
-    player.rect.y = 450
+    player.rect.y = 400
 
     # --- Main loop
     while not done:
@@ -131,7 +147,7 @@ async def game_loop():
                     player.go_right()
                 if event.key == pygame.K_RETURN or event.key == pygame.K_LCTRL:
                     bullet = Bullet()
-                    bullet.rect.x = player.rect.x
+                    bullet.rect.x = player.rect.x + 30
                     bullet.rect.y = player.rect.y
                     all_sprites_list.add(bullet)
                     bullet_list.add(bullet)
@@ -178,3 +194,8 @@ async def game_loop():
         await asyncio.sleep(0)
 
     pygame.quit()
+
+
+if __name__ == "__main__":
+    if not PY2:
+        asyncio.run(game_loop())
