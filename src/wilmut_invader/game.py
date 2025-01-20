@@ -103,7 +103,7 @@ def load_sfx():
     # pygame.mixer.pre_init(44100, 16, 2, 4096)
     # pygame.mixer.init()
     global SFX_SHOT
-    SFX_SHOT = pygame.mixer.Sound("sfx/fart_hi.ogg")
+    SFX_SHOT = pygame.mixer.Sound("sfx/fart.ogg")
 
 
 async def game_loop():
