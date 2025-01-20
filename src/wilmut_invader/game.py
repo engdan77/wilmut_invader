@@ -63,7 +63,7 @@ class Player(pygame.sprite.Sprite):
             self.rect.x = right_side
         left_side = self.rect.width
         if self.rect.x <= left_side - self.rect.width:
-            print(self.rect.x)
+            # print(self.rect.x)
             self.change_x = 0
 
     def go_left(self):
@@ -101,7 +101,7 @@ def load_images():
 
 def load_sfx():
     # pygame.mixer.pre_init(44100, 16, 2, 4096)
-    pygame.mixer.init()
+    # pygame.mixer.init()
     global SFX_SHOT
     SFX_SHOT = pygame.mixer.Sound("sfx/fart.ogg")
 
@@ -183,7 +183,7 @@ async def game_loop():
                 bullet_list.remove(bullet)
                 all_sprites_list.remove(bullet)
                 score += 1
-                print(score)
+                # print(score)
 
             # Remove the bullet if it flies up off the screen
             if bullet.rect.y < -10:
