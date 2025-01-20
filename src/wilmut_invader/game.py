@@ -22,6 +22,8 @@ SCREEN_HEIGHT = 480
 IMG_WILMA = None
 IMG_SLIME = None
 
+SFX_SHOT = None
+
 
 class Block(pygame.sprite.Sprite):
     """ This class represents the block. """
@@ -97,7 +99,17 @@ def load_images():
     IMG_SLIME = pygame.image.load('img/slimeshot.png').convert()
 
 
+def load_sfx():
+    pygame.mixer.pre_init(44100, 16, 2, 4096)
+    pygame.init()
+    global SFX_SHOT
+    SFX_SHOT = pygame.mixer.Sound("sfx/fart.ogg")
+
+
 async def game_loop():
+    load_sfx()
+    pygame.init()
+
     # Initialize Pygame
     pygame.init()
 
@@ -146,6 +158,7 @@ async def game_loop():
                 if event.key == pygame.K_RIGHT:
                     player.go_right()
                 if event.key == pygame.K_RETURN or event.key == pygame.K_LCTRL:
+                    SFX_SHOT.play()
                     bullet = Bullet()
                     bullet.rect.x = player.rect.x + 30
                     bullet.rect.y = player.rect.y
