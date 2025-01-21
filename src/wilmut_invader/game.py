@@ -106,7 +106,7 @@ def load_sfx():
     global SFX_SHOT
     global MUSIC
     SFX_SHOT = pygame.mixer.Sound("sfx/fart.ogg")
-    pygame.mixer.music.load("sfx/rainingbullets.ogg")
+    pygame.mixer.music.load("sfx/rainingbullets_smaller.ogg")
     pygame.mixer.music.play()
 
 
