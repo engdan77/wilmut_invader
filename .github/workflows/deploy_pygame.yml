@@ -12,7 +12,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Checkout
+    - uses: FedericoCarboni/setup-ffmpeg@v2
+    - name: "Build using Pygbag"
       run: |
             echo "Attempting to install pygbag"
             python -m pip install pygbag
