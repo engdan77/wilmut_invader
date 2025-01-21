@@ -150,6 +150,8 @@ async def game_loop():
                 done = True
 
             elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    done = True
                 if event.key == pygame.K_LEFT:
                     player.go_left()
                 if event.key == pygame.K_RIGHT:
@@ -168,6 +170,7 @@ async def game_loop():
                 elif mouse_x > int(SCREEN_WIDTH * 0.7):
                     player.go_right()
                 else:
+                    SFX_SHOT.play()
                     bullet = Bullet()
                     bullet.rect.x = player.rect.x
                     bullet.rect.y = player.rect.y
