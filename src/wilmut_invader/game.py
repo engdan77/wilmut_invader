@@ -23,6 +23,7 @@ IMG_WILMA = None
 IMG_SLIME = None
 
 SFX_SHOT = None
+MUSIC = None
 
 
 class Block(pygame.sprite.Sprite):
@@ -103,7 +104,10 @@ def load_sfx():
     # pygame.mixer.pre_init(44100, 16, 2, 4096)
     # pygame.mixer.init()
     global SFX_SHOT
+    global MUSIC
     SFX_SHOT = pygame.mixer.Sound("sfx/fart.ogg")
+    pygame.mixer.music.load("sfx/rainingbullets.ogg")
+    pygame.mixer.music.play()
 
 
 async def game_loop():
