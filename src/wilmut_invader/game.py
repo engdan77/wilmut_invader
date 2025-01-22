@@ -5,6 +5,7 @@
 # ]
 # ///
 import asyncio
+import math
 import sys
 import pygame
 import random
@@ -20,6 +21,7 @@ SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 480
 
 IMG_WILMA = None
+IMG_DANIEL = None
 IMG_SLIME = None
 
 SFX_SHOT = None
@@ -43,6 +45,20 @@ class Block(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
 
 
+class Enemy(pygame.sprite.Sprite):
+    """ This class represents the block. """
+
+    def __init__(self, image):
+        if PY2:
+            super(Enemy, self).__init__()
+        else:
+            super().__init__()
+
+        self.image = image
+        self.image.set_colorkey((0, 0, 0, 255))
+        self.rect = self.image.get_rect()
+
+
 class Player(pygame.sprite.Sprite):
     """ This class represents the Player. """
 
@@ -52,8 +68,6 @@ class Player(pygame.sprite.Sprite):
         else:
             super().__init__()
         self.change_x = 0
-        # self.image = pygame.Surface([20, 20])
-        # self.image.fill(RED)
         self.image = IMG_WILMA
         self.image.set_colorkey((0, 0, 0, 255))
         self.rect = self.image.get_rect()
@@ -98,7 +112,9 @@ def load_images():
     """Load images into global scope to avoid load and less performance"""
     global IMG_WILMA
     global IMG_SLIME
+    global IMG_DANIEL
     IMG_WILMA = pygame.image.load('img/wilma.png').convert()
+    IMG_DANIEL = pygame.image.load('img/daniel.png').convert()
     IMG_SLIME = pygame.image.load('img/slimeshot.png').convert()
 
 
@@ -110,6 +126,18 @@ def load_sfx():
     SFX_SHOT = pygame.mixer.Sound("sfx/fart.ogg")
     pygame.mixer.music.load("sfx/rainingbullets_smaller.ogg")
     pygame.mixer.music.play()
+
+
+def xy_distance(x1, y1, x2, y2):
+    return math.hypot(x1 - x2, y1 - y2)
+
+
+def is_far_away(x1, y1, current_pos_list):
+    far_away = True
+    for x2, y2 in current_pos_list:
+        if xy_distance(x1, y1, x2, y2) < 50:
+            far_away = False
+    return far_away
 
 
 async def game_loop():
@@ -129,13 +157,20 @@ async def game_loop():
     # List of each bullet
     bullet_list = pygame.sprite.Group()
 
-    for i in range(50):
+    current_enemy_positions = []
+    for i in range(20):
         # This represents a block
-        block = Block(BLUE)
+        # block = Block(BLUE)
+        block = Enemy(IMG_DANIEL)
 
-        # Set a random location for the block
-        block.rect.x = random.randrange(SCREEN_WIDTH)
-        block.rect.y = random.randrange(350)
+        # Set a random location for enemy far away from each others
+        while True:
+            x, y = random.randint(30, SCREEN_WIDTH - 30), random.randrange(350)
+            if is_far_away(x, y, current_enemy_positions):
+                block.rect.x = x
+                block.rect.y = y
+                current_enemy_positions.append((x, y))
+                break
 
         # Add the block to the list of objects
         block_list.add(block)
@@ -162,7 +197,7 @@ async def game_loop():
                     player.go_left()
                 if event.key == pygame.K_RIGHT:
                     player.go_right()
-                if event.key == pygame.K_RETURN or event.key == pygame.K_LCTRL:
+                if event.key == pygame.K_RETURN or event.key == pygame.K_LCTRL or event.key == pygame.K_SPACE:
                     SFX_SHOT.play()
                     bullet = Bullet()
                     bullet.rect.x = player.rect.x + 30
