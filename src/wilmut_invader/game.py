@@ -25,6 +25,8 @@ IMG_SLIME = None
 SFX_SHOT = None
 MUSIC = None
 
+bg_image = pygame.image.load('img/background.png')
+
 
 class Block(pygame.sprite.Sprite):
     """ This class represents the block. """
@@ -199,6 +201,10 @@ async def game_loop():
 
         # Clear the screen
         screen.fill(WHITE)
+
+        # Set background
+        screen.blit(bg_image, (0, 0))
+        pygame.display.update()
 
         # Draw all the spites
         all_sprites_list.draw(screen)
