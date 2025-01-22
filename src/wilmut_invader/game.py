@@ -27,7 +27,12 @@ IMG_SLIME = None
 SFX_SHOT = None
 MUSIC = None
 
-bg_image = pygame.image.load('img/background.png')
+BG_IMAGE = pygame.image.load('img/background.png')
+
+# Load a custom font
+font_path = 'fonts/my.ttf'
+font_size = 60
+score_font = None
 
 
 class Block(pygame.sprite.Sprite):
@@ -118,6 +123,12 @@ def load_images():
     IMG_SLIME = pygame.image.load('img/slimeshot.png').convert()
 
 
+def load_fonts():
+    global score_font
+    score_font = pygame.font.Font(font_path, font_size)
+    # score_font = pygame.font.SysFont('arial', 30, bold=True)
+
+
 def load_sfx():
     # pygame.mixer.pre_init(44100, 16, 2, 4096)
     # pygame.mixer.init()
@@ -148,6 +159,8 @@ async def game_loop():
 
     load_images()
 
+    load_fonts()
+
     # This is a list of every sprite. All blocks and the player block as well.
     all_sprites_list = pygame.sprite.Group()
 
@@ -165,7 +178,7 @@ async def game_loop():
 
         # Set a random location for enemy far away from each others
         while True:
-            x, y = random.randint(30, SCREEN_WIDTH - 30), random.randrange(350)
+            x, y = random.randint(30, SCREEN_WIDTH - 30), random.randint(60, 350)
             if is_far_away(x, y, current_enemy_positions):
                 block.rect.x = x
                 block.rect.y = y
@@ -226,7 +239,7 @@ async def game_loop():
             for block in block_hit_list:
                 bullet_list.remove(bullet)
                 all_sprites_list.remove(bullet)
-                score += 1
+                score += 10
                 # print(score)
 
             # Remove the bullet if it flies up off the screen
@@ -238,11 +251,15 @@ async def game_loop():
         screen.fill(WHITE)
 
         # Set background
-        screen.blit(bg_image, (0, 0))
+        screen.blit(BG_IMAGE, (0, 0))
         pygame.display.update()
 
         # Draw all the spites
         all_sprites_list.draw(screen)
+
+        # Put scores
+        text_surface = score_font.render(str(score), True, (255, 0, 0))
+        screen.blit(text_surface, (SCREEN_WIDTH - 150, 5))
 
         # Go ahead and update the screen with what we've drawn.
         pygame.display.flip()
