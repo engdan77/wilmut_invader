@@ -26,7 +26,7 @@ GameDataFile=""
 
 # additional configuration
 KillAudioserver=1
-PerformanceMode=0
+PerformanceMode=1
 
 # specific to this port :
 Arguments=""
