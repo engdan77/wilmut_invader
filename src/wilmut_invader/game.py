@@ -27,12 +27,13 @@ IMG_SLIME = None
 SFX_SHOT = None
 MUSIC = None
 
+GAME_DONE = False
+
 BG_IMAGE = pygame.image.load('img/background.png')
 
 # Load a custom font
-font_path = 'fonts/my.ttf'
-font_size = 60
-score_font = None
+score_font_path = 'fonts/my.ttf'
+score_font_size = 60
 
 
 class Block(pygame.sprite.Sprite):
@@ -67,13 +68,13 @@ class Enemy(pygame.sprite.Sprite):
 class Player(pygame.sprite.Sprite):
     """ This class represents the Player. """
 
-    def __init__(self):
+    def __init__(self, image):
         if PY2:
             super(Player, self).__init__()
         else:
             super().__init__()
         self.change_x = 0
-        self.image = IMG_WILMA
+        self.image = image
         self.image.set_colorkey((0, 0, 0, 255))
         self.rect = self.image.get_rect()
 
@@ -98,45 +99,18 @@ class Player(pygame.sprite.Sprite):
 class Bullet(pygame.sprite.Sprite):
     """ This class represents the bullet . """
 
-    def __init__(self):
+    def __init__(self, image):
         if PY2:
             super(Bullet, self).__init__()
         else:
             super().__init__()
-        # self.image = pygame.Surface([4, 10])
-        # self.image.fill(BLACK)
-        self.image = IMG_SLIME
+
+        self.image = image
         self.image.set_colorkey((0, 0, 0, 255))
         self.rect = self.image.get_rect()
 
     def update(self):
         self.rect.y -= 3
-
-
-def load_images():
-    """Load images into global scope to avoid load and less performance"""
-    global IMG_WILMA
-    global IMG_SLIME
-    global IMG_DANIEL
-    IMG_WILMA = pygame.image.load('img/wilma.png').convert()
-    IMG_DANIEL = pygame.image.load('img/daniel.png').convert()
-    IMG_SLIME = pygame.image.load('img/slimeshot.png').convert()
-
-
-def load_fonts():
-    global score_font
-    score_font = pygame.font.Font(font_path, font_size)
-    # score_font = pygame.font.SysFont('arial', 30, bold=True)
-
-
-def load_sfx():
-    # pygame.mixer.pre_init(44100, 16, 2, 4096)
-    # pygame.mixer.init()
-    global SFX_SHOT
-    global MUSIC
-    SFX_SHOT = pygame.mixer.Sound("sfx/fart.ogg")
-    pygame.mixer.music.load("sfx/rainingbullets_smaller.ogg")
-    pygame.mixer.music.play()
 
 
 def xy_distance(x1, y1, x2, y2):
@@ -151,123 +125,135 @@ def is_far_away(x1, y1, current_pos_list):
     return far_away
 
 
-async def game_loop():
-    pygame.init()
-    load_sfx()
+def start_music():
+    pygame.mixer.music.load("sfx/rainingbullets_smaller.ogg")
+    pygame.mixer.music.play(-1)
 
-    screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
 
-    load_images()
+class Game:
 
-    load_fonts()
+    def __init__(self):
+        self.screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
 
-    # This is a list of every sprite. All blocks and the player block as well.
-    all_sprites_list = pygame.sprite.Group()
+        self.IMG_WILMA = pygame.image.load('img/wilma.png').convert()
+        self.IMG_DANIEL = pygame.image.load('img/daniel.png').convert()
+        self.IMG_SLIME = pygame.image.load('img/slimeshot.png').convert()
 
-    # List of each block in the game
-    block_list = pygame.sprite.Group()
+        self.SFX_SHOT = pygame.mixer.Sound("sfx/fart.ogg")
+        self.score_font = pygame.font.Font(score_font_path, score_font_size)
 
-    # List of each bullet
-    bullet_list = pygame.sprite.Group()
+        # This is a list of every sprite. All blocks and the player block as well.
+        self.all_sprites_list = pygame.sprite.Group()
 
-    current_enemy_positions = []
-    for i in range(20):
-        # This represents a block
-        # block = Block(BLUE)
-        block = Enemy(IMG_DANIEL)
+        # List of each block in the game
+        self.enemy_list = pygame.sprite.Group()
 
-        # Set a random location for enemy far away from each others
-        while True:
-            x, y = random.randint(30, SCREEN_WIDTH - 30), random.randint(60, 350)
-            if is_far_away(x, y, current_enemy_positions):
-                block.rect.x = x
-                block.rect.y = y
-                current_enemy_positions.append((x, y))
-                break
+        # List of each bullet
+        self.bullet_list = pygame.sprite.Group()
 
-        # Add the block to the list of objects
-        block_list.add(block)
-        all_sprites_list.add(block)
+        current_enemy_positions = []
+        for i in range(20):
+            block = Enemy(self.IMG_DANIEL)
 
-    # Create a red player block
-    player = Player()
-    all_sprites_list.add(player)
-    done = False
-    clock = pygame.time.Clock()
-    score = 0
-    player.rect.y = 400
+            # Set a random location for enemy far away from each others
+            while True:
+                x, y = random.randint(30, SCREEN_WIDTH - 30), random.randint(60, 350)
+                if is_far_away(x, y, current_enemy_positions):
+                    block.rect.x = x
+                    block.rect.y = y
+                    current_enemy_positions.append((x, y))
+                    break
 
-    # --- Main loop
-    while not done:
-        for event in pygame.event.get():
+            # Add the block to the list of objects
+            self.enemy_list.add(block)
+            self.all_sprites_list.add(block)
+
+        # Create a red player block
+        self.player = Player(self.IMG_WILMA)
+        self.all_sprites_list.add(self.player)
+        self.done = False
+        self.clock = pygame.time.Clock()
+        self.score = 0
+        self.player.rect.y = 400
+
+        start_music()
+
+    def first_game(self, events):
+        for event in events:
             if event.type == pygame.QUIT:
-                done = True
+                self.done = True
 
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    done = True
+                    self.done = True
                 if event.key == pygame.K_LEFT:
-                    player.go_left()
+                    self.player.go_left()
                 if event.key == pygame.K_RIGHT:
-                    player.go_right()
+                    self.player.go_right()
                 if event.key == pygame.K_RETURN or event.key == pygame.K_LCTRL or event.key == pygame.K_SPACE:
-                    SFX_SHOT.play()
-                    bullet = Bullet()
-                    bullet.rect.x = player.rect.x + 30
-                    bullet.rect.y = player.rect.y
-                    all_sprites_list.add(bullet)
-                    bullet_list.add(bullet)
+                    self.SFX_SHOT.play()
+                    bullet = Bullet(self.IMG_SLIME)
+                    bullet.rect.x = self.player.rect.x + 30
+                    bullet.rect.y = self.player.rect.y
+                    self.all_sprites_list.add(bullet)
+                    self.bullet_list.add(bullet)
             elif pygame.mouse.get_pressed()[0]:
                 mouse_x, _ = pygame.mouse.get_pos()
                 if mouse_x < int(SCREEN_WIDTH * 0.3):
-                    player.go_left()
+                    self.player.go_left()
                 elif mouse_x > int(SCREEN_WIDTH * 0.7):
-                    player.go_right()
+                    self.player.go_right()
                 else:
-                    SFX_SHOT.play()
+                    self.SFX_SHOT.play()
                     bullet = Bullet()
-                    bullet.rect.x = player.rect.x
-                    bullet.rect.y = player.rect.y
-                    all_sprites_list.add(bullet)
-                    bullet_list.add(bullet)
+                    bullet.rect.x = self.player.rect.x
+                    bullet.rect.y = self.player.rect.y
+                    self.all_sprites_list.add(bullet)
+                    self.bullet_list.add(bullet)
 
-        all_sprites_list.update()
-        for bullet in bullet_list:
-            block_hit_list = pygame.sprite.spritecollide(bullet, block_list, True)
+        self.all_sprites_list.update()
+        for bullet in self.bullet_list:
+            block_hit_list = pygame.sprite.spritecollide(bullet, self.enemy_list, True)
 
             # For each block hit, remove the bullet and add to the score
             for block in block_hit_list:
-                bullet_list.remove(bullet)
-                all_sprites_list.remove(bullet)
-                score += 10
-                # print(score)
+                self.bullet_list.remove(bullet)
+                self.all_sprites_list.remove(bullet)
+                self.score += 10
 
             # Remove the bullet if it flies up off the screen
             if bullet.rect.y < -10:
-                bullet_list.remove(bullet)
-                all_sprites_list.remove(bullet)
+                self.bullet_list.remove(bullet)
+                self.all_sprites_list.remove(bullet)
 
         # Clear the screen
-        screen.fill(WHITE)
+        self.screen.fill(WHITE)
 
         # Set background
-        screen.blit(BG_IMAGE, (0, 0))
+        self.screen.blit(BG_IMAGE, (0, 0))
         pygame.display.update()
 
         # Draw all the spites
-        all_sprites_list.draw(screen)
+        self.all_sprites_list.draw(self.screen)
 
         # Put scores
-        text_surface = score_font.render(str(score), True, (255, 0, 0))
-        screen.blit(text_surface, (SCREEN_WIDTH - 150, 5))
+        text_surface = self.score_font.render(str(self.score), True, (255, 0, 0))
+        self.screen.blit(text_surface, (SCREEN_WIDTH - 150, 5))
+
+
+async def game_loop():
+    pygame.init()
+    game = Game()
+
+    # MAIN LOOP
+    while not game.done:
+        events = pygame.event.get()
+        game.first_game(events)
 
         # Go ahead and update the screen with what we've drawn.
         pygame.display.flip()
-
-        clock.tick(60)
-
+        game.clock.tick(60)
         await asyncio.sleep(0)
-
     pygame.quit()
 
 
