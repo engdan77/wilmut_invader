@@ -38,12 +38,12 @@ class Block(pygame.sprite.Sprite):
 class Enemy(pygame.sprite.Sprite):
     """ This class represents the block. """
 
-    def __init__(self, image):
+    def __init__(self, image, game):
         if PY2:
             super(Enemy, self).__init__()
         else:
             super().__init__()
-
+        self.game = game
         self.image = image
         self.image.set_colorkey((0, 0, 0, 255))
         self.rect = self.image.get_rect()
@@ -52,11 +52,12 @@ class Enemy(pygame.sprite.Sprite):
 class Player(pygame.sprite.Sprite):
     """ This class represents the Player. """
 
-    def __init__(self, image):
+    def __init__(self, image, game):
         if PY2:
             super(Player, self).__init__()
         else:
             super().__init__()
+        self.game = game
         self.change_x = 0
         self.image = image
         self.image.set_colorkey((0, 0, 0, 255))
@@ -74,27 +75,27 @@ class Player(pygame.sprite.Sprite):
             self.change_x = 0
 
     def go_left(self):
-        self.change_x = -4
+        self.change_x = -2 * self.game.pace
 
     def go_right(self):
-        self.change_x = 4
+        self.change_x = 2 * self.game.pace
 
 
 class Bullet(pygame.sprite.Sprite):
     """ This class represents the bullet . """
 
-    def __init__(self, image):
+    def __init__(self, image, game):
         if PY2:
             super(Bullet, self).__init__()
         else:
             super().__init__()
-
+        self.game = game
         self.image = image
         self.image.set_colorkey((0, 0, 0, 255))
         self.rect = self.image.get_rect()
 
     def update(self):
-        self.rect.y -= 3
+        self.rect.y -= 2 * self.game.pace
 
 
 def xy_distance(x1, y1, x2, y2):
@@ -117,10 +118,11 @@ def start_music():
 class Game:
 
     def __init__(self):
+        self.pace = 0  # The tick between frames to keep consistent speed across devices
+
         self.screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
 
         self.BG_IMAGE = pygame.image.load('img/background.png')
-
         self.IMG_WILMA = pygame.image.load('img/wilma.png').convert()
         self.IMG_DANIEL = pygame.image.load('img/daniel.png').convert()
         self.IMG_SLIME = pygame.image.load('img/slimeshot.png').convert()
@@ -139,7 +141,7 @@ class Game:
 
         current_enemy_positions = []
         for i in range(20):
-            block = Enemy(self.IMG_DANIEL)
+            block = Enemy(self.IMG_DANIEL, self)
 
             # Set a random location for enemy far away from each others
             while True:
@@ -155,7 +157,7 @@ class Game:
             self.all_sprites_list.add(block)
 
         # Create a red player block
-        self.player = Player(self.IMG_WILMA)
+        self.player = Player(self.IMG_WILMA, self)
         self.all_sprites_list.add(self.player)
         self.done = False
         self.clock = pygame.time.Clock()
@@ -178,7 +180,7 @@ class Game:
                     self.player.go_right()
                 if event.key == pygame.K_RETURN or event.key == pygame.K_LCTRL or event.key == pygame.K_SPACE:
                     self.SFX_SHOT.play()
-                    bullet = Bullet(self.IMG_SLIME)
+                    bullet = Bullet(self.IMG_SLIME, self)
                     bullet.rect.x = self.player.rect.x + 30
                     bullet.rect.y = self.player.rect.y
                     self.all_sprites_list.add(bullet)
@@ -226,6 +228,11 @@ class Game:
         text_surface = self.score_font.render(str(self.score), True, (255, 0, 0))
         self.screen.blit(text_surface, (SCREEN_WIDTH - 150, 5))
 
+    def tick(self):
+        # get ms between updates
+        self.pace = self.clock.tick(60) / 10
+        print(self.pace)
+
 
 async def game_loop():
     pygame.init()
@@ -238,7 +245,7 @@ async def game_loop():
 
         # Go ahead and update the screen with what we've drawn.
         pygame.display.flip()
-        game.clock.tick(60)
+        game.tick()
         await asyncio.sleep(0)
     pygame.quit()
 
