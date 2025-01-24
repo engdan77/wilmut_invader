@@ -20,22 +20,6 @@ BLUE = (0, 0, 255)
 SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 480
 
-IMG_WILMA = None
-IMG_DANIEL = None
-IMG_SLIME = None
-
-SFX_SHOT = None
-MUSIC = None
-
-GAME_DONE = False
-
-BG_IMAGE = pygame.image.load('img/background.png')
-
-# Load a custom font
-score_font_path = 'fonts/my.ttf'
-score_font_size = 60
-
-
 class Block(pygame.sprite.Sprite):
     """ This class represents the block. """
 
@@ -135,12 +119,14 @@ class Game:
     def __init__(self):
         self.screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
 
+        self.BG_IMAGE = pygame.image.load('img/background.png')
+
         self.IMG_WILMA = pygame.image.load('img/wilma.png').convert()
         self.IMG_DANIEL = pygame.image.load('img/daniel.png').convert()
         self.IMG_SLIME = pygame.image.load('img/slimeshot.png').convert()
 
         self.SFX_SHOT = pygame.mixer.Sound("sfx/fart.ogg")
-        self.score_font = pygame.font.Font(score_font_path, score_font_size)
+        self.score_font = pygame.font.Font('fonts/my.ttf', 60)
 
         # This is a list of every sprite. All blocks and the player block as well.
         self.all_sprites_list = pygame.sprite.Group()
@@ -230,7 +216,7 @@ class Game:
         self.screen.fill(WHITE)
 
         # Set background
-        self.screen.blit(BG_IMAGE, (0, 0))
+        self.screen.blit(self.BG_IMAGE, (0, 0))
         pygame.display.update()
 
         # Draw all the spites
