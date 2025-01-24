@@ -210,7 +210,7 @@ class Game:
                     self.player.go_right()
                 else:
                     self.SFX_SHOT.play()
-                    bullet = Bullet()
+                    bullet = Bullet(self.IMG_SLIME, self)
                     bullet.rect.x = self.player.rect.x
                     bullet.rect.y = self.player.rect.y
                     self.all_sprites_list.add(bullet)
