@@ -20,6 +20,7 @@ BLUE = (0, 0, 255)
 SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 480
 
+
 class Block(pygame.sprite.Sprite):
     """ This class represents the block. """
 
@@ -71,7 +72,6 @@ class Player(pygame.sprite.Sprite):
             self.rect.x = right_side
         left_side = self.rect.width
         if self.rect.x <= left_side - self.rect.width:
-            # print(self.rect.x)
             self.change_x = 0
 
     def go_left(self):
@@ -118,11 +118,15 @@ def start_music():
 class Game:
 
     def __init__(self):
+        self.done = False
+        self.clock = pygame.time.Clock()
         self.pace = 0  # The tick between frames to keep consistent speed across devices
+        self.stage = 'intro'
 
         self.screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
 
         self.BG_IMAGE = pygame.image.load('img/background.png')
+        self.BG_INTRO = pygame.image.load('img/intro.png').convert()
         self.IMG_WILMA = pygame.image.load('img/wilma.png').convert()
         self.IMG_DANIEL = pygame.image.load('img/daniel.png').convert()
         self.IMG_SLIME = pygame.image.load('img/slimeshot.png').convert()
@@ -130,6 +134,22 @@ class Game:
         self.SFX_SHOT = pygame.mixer.Sound("sfx/fart.ogg")
         self.score_font = pygame.font.Font('fonts/my.ttf', 60)
 
+    def intro(self, events):
+        self.screen.fill(WHITE)
+        self.screen.blit(self.BG_INTRO, (0, 0))
+        pygame.display.update()
+        for event in events:
+            print(event)
+            if event.type == pygame.QUIT:
+                self.done = True
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    self.done = True
+                if event.key == pygame.K_RETURN or event.key == pygame.K_LCTRL or event.key == pygame.K_SPACE:
+                    print('Starting first game')
+                    self.stage = 'init_first_game'
+
+    def init_first_game(self):
         # This is a list of every sprite. All blocks and the player block as well.
         self.all_sprites_list = pygame.sprite.Group()
 
@@ -151,22 +171,18 @@ class Game:
                     block.rect.y = y
                     current_enemy_positions.append((x, y))
                     break
-
             # Add the block to the list of objects
             self.enemy_list.add(block)
             self.all_sprites_list.add(block)
 
-        # Create a red player block
         self.player = Player(self.IMG_WILMA, self)
         self.all_sprites_list.add(self.player)
-        self.done = False
-        self.clock = pygame.time.Clock()
         self.score = 0
         self.player.rect.y = 400
-
         start_music()
+        self.stage = 'run_first_game'
 
-    def first_game(self, events):
+    def run_first_game(self, events):
         for event in events:
             if event.type == pygame.QUIT:
                 self.done = True
@@ -231,7 +247,6 @@ class Game:
     def tick(self):
         # get ms between updates
         self.pace = self.clock.tick(60) / 10
-        print(self.pace)
 
 
 async def game_loop():
@@ -241,7 +256,13 @@ async def game_loop():
     # MAIN LOOP
     while not game.done:
         events = pygame.event.get()
-        game.first_game(events)
+
+        if game.stage == 'intro':
+            game.intro(events)
+        elif game.stage == 'init_first_game':
+            game.init_first_game()
+        elif game.stage == 'run_first_game':
+            game.run_first_game(events)
 
         # Go ahead and update the screen with what we've drawn.
         pygame.display.flip()
