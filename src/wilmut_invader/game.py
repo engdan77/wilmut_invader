@@ -146,8 +146,9 @@ class Game:
                 if event.key == pygame.K_ESCAPE:
                     self.done = True
                 if event.key == pygame.K_RETURN or event.key == pygame.K_LCTRL or event.key == pygame.K_SPACE:
-                    print('Starting first game')
                     self.stage = 'init_first_game'
+            elif pygame.mouse.get_pressed()[0]:
+                self.stage = 'init_first_game'
 
     def init_first_game(self):
         # This is a list of every sprite. All blocks and the player block as well.
