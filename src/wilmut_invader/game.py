@@ -139,7 +139,6 @@ class Game:
         self.screen.blit(self.BG_INTRO, (0, 0))
         pygame.display.update()
         for event in events:
-            print(event)
             if event.type == pygame.QUIT:
                 self.done = True
             elif event.type == pygame.KEYDOWN:
