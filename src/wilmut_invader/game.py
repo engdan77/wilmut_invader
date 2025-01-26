@@ -129,6 +129,8 @@ class Game:
         self.BG_INTRO = pygame.image.load('img/intro.png').convert()
         self.IMG_WILMA = pygame.image.load('img/wilma.png').convert()
         self.IMG_DANIEL = pygame.image.load('img/daniel.png').convert()
+        self.IMG_ALFONS = pygame.image.load('img/alfons.png').convert()
+        self.IMG_FIA = pygame.image.load('img/fia.png').convert()
         self.IMG_SLIME = pygame.image.load('img/slimeshot.png').convert()
 
         self.SFX_SHOT = pygame.mixer.Sound("sfx/fart.ogg")
@@ -161,7 +163,7 @@ class Game:
 
         current_enemy_positions = []
         for i in range(20):
-            block = Enemy(self.IMG_DANIEL, self)
+            block = Enemy(random.choice([self.IMG_DANIEL, self.IMG_ALFONS, self.IMG_FIA]), self)
 
             # Set a random location for enemy far away from each others
             while True:
