@@ -39,7 +39,7 @@ class Block(pygame.sprite.Sprite):
 class Enemy(pygame.sprite.Sprite):
     """ This class represents the block. """
 
-    def __init__(self, image, game):
+    def __init__(self, image, game, enemy_pace=1):
         if PY2:
             super(Enemy, self).__init__()
         else:
@@ -48,6 +48,19 @@ class Enemy(pygame.sprite.Sprite):
         self.image = image
         self.image.set_colorkey((0, 0, 0, 255))
         self.rect = self.image.get_rect()
+        self.enemy_pace = enemy_pace
+
+    def reset_pos(self):
+        """ Reset position to the top of the screen, at a random x location.
+        Called by update() or the main program loop if there is a collision.
+        """
+        self.rect.y = random.randrange(-300, -20)
+        self.rect.x = random.randrange(0, SCREEN_WIDTH)
+
+    def update(self):
+        self.rect.y += 1
+        # self.rect.y += int(0.3 * self.game.pace * self.enemy_pace)
+        # TODO: Make this slower
 
 
 class Player(pygame.sprite.Sprite):
@@ -102,10 +115,12 @@ def xy_distance(x1, y1, x2, y2):
     return math.hypot(x1 - x2, y1 - y2)
 
 
-def is_far_away(x1, y1, current_pos_list):
+def is_far_away(x1, y1, current_pos_list, screen_margins=50):
     far_away = True
     for x2, y2 in current_pos_list:
         if xy_distance(x1, y1, x2, y2) < 50:
+            far_away = False
+        if x1 < screen_margins or x1 >= SCREEN_WIDTH - screen_margins:
             far_away = False
     return far_away
 
@@ -152,30 +167,30 @@ class Game:
                 self.stage = 'init_first_game'
 
     def init_first_game(self):
-        # This is a list of every sprite. All blocks and the player block as well.
+        # This is a list of every sprite. All blocks and the player enemy as well.
         self.all_sprites_list = pygame.sprite.Group()
 
-        # List of each block in the game
+        # List of each enemy in the game
         self.enemy_list = pygame.sprite.Group()
 
         # List of each bullet
         self.bullet_list = pygame.sprite.Group()
 
         current_enemy_positions = []
-        for i in range(20):
-            block = Enemy(random.choice([self.IMG_DANIEL, self.IMG_ALFONS, self.IMG_FIA]), self)
+        for i in range(15):
+            enemy = Enemy(random.choice([self.IMG_DANIEL, self.IMG_ALFONS, self.IMG_FIA]), self)
 
             # Set a random location for enemy far away from each others
             while True:
-                x, y = random.randint(30, SCREEN_WIDTH - 30), random.randint(60, 350)
+                x, y = self.get_random_x_above_view(), self.get_random_y_above_view()
                 if is_far_away(x, y, current_enemy_positions):
-                    block.rect.x = x
-                    block.rect.y = y
+                    enemy.rect.x = x
+                    enemy.rect.y = y
                     current_enemy_positions.append((x, y))
                     break
-            # Add the block to the list of objects
-            self.enemy_list.add(block)
-            self.all_sprites_list.add(block)
+            # Add the enemy to the list of objects
+            self.enemy_list.add(enemy)
+            self.all_sprites_list.add(enemy)
 
         self.player = Player(self.IMG_WILMA, self)
         self.all_sprites_list.add(self.player)
@@ -183,6 +198,13 @@ class Game:
         self.player.rect.y = 400
         start_music()
         self.stage = 'run_first_game'
+
+    def get_random_y_above_view(self):
+        # return random.randint(60, 350)
+        return random.randint(50, 300) * -1
+
+    def get_random_x_above_view(self):
+        return random.randint(30, SCREEN_WIDTH - 30)
 
     def run_first_game(self, events):
         for event in events:
@@ -240,6 +262,7 @@ class Game:
         pygame.display.update()
 
         # Draw all the spites
+        self.enemy_list.update()
         self.all_sprites_list.draw(self.screen)
 
         # Put scores
