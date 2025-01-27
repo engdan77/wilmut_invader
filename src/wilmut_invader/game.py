@@ -40,7 +40,7 @@ class Block(pygame.sprite.Sprite):
 class Enemy(pygame.sprite.Sprite):
     """ This class represents the block. """
 
-    def __init__(self, image, game, enemy_pace=0.4):
+    def __init__(self, image, game, enemy_pace=0.3):
         if PY2:
             super(Enemy, self).__init__()
         else:
@@ -50,16 +50,7 @@ class Enemy(pygame.sprite.Sprite):
         self.image.set_colorkey((0, 0, 0, 255))
         self.rect = self.image.get_rect()
         self.enemy_pace = enemy_pace
-        if self.enemy_pace < 1:
-            # Technique for skip frames when there should be less than one pixel per frame
-            positives = '1' * int(self.enemy_pace * 10)
-            negatives = '0' * (10 - len(positives))
-            string_chance = positives + negatives
-            fraction_list = list(string_chance)
-            random.shuffle(fraction_list)
-            self.slow_down = itertools.cycle(fraction_list)
-        else:
-            self.slow_down = None
+        self.pos_y = self.rect.y
 
     def reset_pos(self):
         """ Reset position to the top of the screen, at a random x location.
@@ -69,14 +60,8 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.x = random.randrange(0, SCREEN_WIDTH)
 
     def update(self):
-        if self.slow_down is not None:
-            move = next(self.slow_down)
-            if int(move) == 0:
-                return
-        if self.rect.y < 0:
-            self.rect.y += self.game.pace * self.enemy_pace
-        else:
-            self.rect.y += self.game.pace * self.enemy_pace
+        self.pos_y += self.enemy_pace
+        self.rect.y = self.pos_y
 
 
 class Player(pygame.sprite.Sprite):
