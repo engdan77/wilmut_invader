@@ -5,6 +5,7 @@
 # ]
 # ///
 import asyncio
+import itertools
 import math
 import sys
 import pygame
@@ -39,7 +40,7 @@ class Block(pygame.sprite.Sprite):
 class Enemy(pygame.sprite.Sprite):
     """ This class represents the block. """
 
-    def __init__(self, image, game, enemy_pace=1):
+    def __init__(self, image, game, enemy_pace=0.4):
         if PY2:
             super(Enemy, self).__init__()
         else:
@@ -49,18 +50,30 @@ class Enemy(pygame.sprite.Sprite):
         self.image.set_colorkey((0, 0, 0, 255))
         self.rect = self.image.get_rect()
         self.enemy_pace = enemy_pace
+        if self.enemy_pace < 1:
+            # Technique for skip frames when there should be less than one pixel per frame
+            positives = '1' * int(self.enemy_pace * 10)
+            negatives = '0' * (10 - len(positives))
+            string_chance = positives + negatives
+            fraction_list = list(string_chance)
+            random.shuffle(fraction_list)
+            self.slow_down = itertools.cycle(fraction_list)
+        else:
+            self.slow_down = None
 
     def reset_pos(self):
         """ Reset position to the top of the screen, at a random x location.
         Called by update() or the main program loop if there is a collision.
         """
-        self.rect.y = random.randrange(-300, -20)
+        self.rect.y = random.randrange(-1200, -20)
         self.rect.x = random.randrange(0, SCREEN_WIDTH)
 
     def update(self):
-        self.rect.y += 1
-        # self.rect.y += int(0.3 * self.game.pace * self.enemy_pace)
-        # TODO: Make this slower
+        if self.slow_down is not None:
+            move = next(self.slow_down)
+            if int(move) == 0:
+                return
+        self.rect.y += self.game.pace * self.enemy_pace
 
 
 class Player(pygame.sprite.Sprite):
@@ -201,7 +214,7 @@ class Game:
 
     def get_random_y_above_view(self):
         # return random.randint(60, 350)
-        return random.randint(50, 300) * -1
+        return random.randint(50, 800) * -1
 
     def get_random_x_above_view(self):
         return random.randint(30, SCREEN_WIDTH - 30)
