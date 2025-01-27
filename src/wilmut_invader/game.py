@@ -51,6 +51,7 @@ class Enemy(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.enemy_pace = enemy_pace
         self.pos_y = self.rect.y
+        self.pos_x = self.rect.x
 
     def reset_pos(self):
         """ Reset position to the top of the screen, at a random x location.
@@ -62,6 +63,7 @@ class Enemy(pygame.sprite.Sprite):
     def update(self):
         self.pos_y += self.enemy_pace
         self.rect.y = self.pos_y
+        self.rect.x = self.pos_x
 
 
 class Player(pygame.sprite.Sprite):
@@ -185,8 +187,8 @@ class Game:
             while True:
                 x, y = self.get_random_x_above_view(), self.get_random_y_above_view()
                 if is_far_away(x, y, current_enemy_positions):
-                    enemy.rect.x = x
-                    enemy.rect.y = y
+                    enemy.pos_x = x
+                    enemy.pos_y = y
                     current_enemy_positions.append((x, y))
                     break
             # Add the enemy to the list of objects
