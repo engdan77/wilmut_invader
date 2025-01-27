@@ -76,7 +76,7 @@ class Enemy(pygame.sprite.Sprite):
         if self.rect.y < 0:
             self.rect.y += self.game.pace * self.enemy_pace
         else:
-            self.rect.y -= self.game.pace * self.enemy_pace
+            self.rect.y += self.game.pace * self.enemy_pace
 
 
 class Player(pygame.sprite.Sprite):
