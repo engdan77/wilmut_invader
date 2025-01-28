@@ -182,18 +182,9 @@ class Game:
         # List of each bullet
         self.bullet_list = pygame.sprite.Group()
 
-        current_enemy_positions = []
         for i in range(15):
-            enemy = Enemy(random.choice([self.IMG_DANIEL, self.IMG_ALFONS, self.IMG_FIA]), self)
-
-            # Set a random location for enemy far away from each others
-            while True:
-                x, y = self.get_random_x_above_view(), self.get_random_y_above_view()
-                if is_far_away(x, y, current_enemy_positions):
-                    enemy.pos_x = x
-                    enemy.pos_y = y
-                    current_enemy_positions.append((x, y))
-                    break
+            image = random.choice([self.IMG_DANIEL, self.IMG_ALFONS, self.IMG_FIA])
+            enemy = self.create_falling_enemy(image, velocity=0.3)
             # Add the enemy to the list of objects
             self.enemy_list.add(enemy)
             self.all_sprites_list.add(enemy)
@@ -204,6 +195,17 @@ class Game:
         self.player.rect.y = 400
         start_music()
         self.stage = 'run_first_game'
+
+    def create_falling_enemy(self, image, velocity=0.3):
+        enemy = Enemy(image, self, enemy_velocity=velocity)
+        # Set a random location for enemy far away from each others
+        while True:
+            x, y = self.get_random_x_above_view(), self.get_random_y_above_view()
+            if is_far_away(x, y, [(_.pos_x, _.pos_y) for _ in self.enemy_list.sprites()]):
+                enemy.pos_x = x
+                enemy.pos_y = y
+                break
+        return enemy
 
     def get_random_y_above_view(self):
         # return random.randint(60, 350)
