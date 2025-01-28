@@ -183,8 +183,7 @@ class Game:
         self.bullet_list = pygame.sprite.Group()
 
         for i in range(15):
-            image = random.choice([self.IMG_DANIEL, self.IMG_ALFONS, self.IMG_FIA])
-            enemy = self.create_falling_enemy(image, velocity=0.3)
+            enemy = self.create_falling_enemy(velocity=0.3)
             # Add the enemy to the list of objects
             self.enemy_list.add(enemy)
             self.all_sprites_list.add(enemy)
@@ -196,7 +195,9 @@ class Game:
         start_music()
         self.stage = 'run_first_game'
 
-    def create_falling_enemy(self, image, velocity=0.3):
+    def create_falling_enemy(self, velocity=0.3, image=None):
+        if not image:
+            image = random.choice([self.IMG_DANIEL, self.IMG_ALFONS, self.IMG_FIA])
         enemy = Enemy(image, self, enemy_velocity=velocity)
         # Set a random location for enemy far away from each others
         while True:
@@ -209,7 +210,7 @@ class Game:
 
     def get_random_y_above_view(self):
         # return random.randint(60, 350)
-        return random.randint(50, 800) * -1
+        return random.randint(50, 1600) * -1
 
     def get_random_x_above_view(self):
         return random.randint(30, SCREEN_WIDTH - 30)
@@ -251,6 +252,9 @@ class Game:
         for bullet in self.bullet_list:
             # This removes the enemy from the enemy_list
             enemy_hit_list = pygame.sprite.spritecollide(bullet, self.enemy_list, True)
+            enemy = self.create_falling_enemy(velocity=0.3)
+            # TODO: Add enemies
+            # self.enemy_list.add(enemy)
 
             # For each enemy hit, remove the bullet and add to the score
             for _ in enemy_hit_list:
