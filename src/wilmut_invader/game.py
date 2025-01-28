@@ -21,6 +21,9 @@ BLUE = (0, 0, 255)
 SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 480
 
+FPS = 60
+OPTIMAL_MS_PER_TICK = int(1000 / FPS)
+
 
 class Block(pygame.sprite.Sprite):
     """ This class represents the block. """
@@ -40,7 +43,7 @@ class Block(pygame.sprite.Sprite):
 class Enemy(pygame.sprite.Sprite):
     """ This class represents the block. """
 
-    def __init__(self, image, game, enemy_pace=0.3):
+    def __init__(self, image, game, enemy_velocity=0.3):
         if PY2:
             super(Enemy, self).__init__()
         else:
@@ -49,7 +52,7 @@ class Enemy(pygame.sprite.Sprite):
         self.image = image
         self.image.set_colorkey((0, 0, 0, 255))
         self.rect = self.image.get_rect()
-        self.enemy_pace = enemy_pace
+        self.enemy_velocity = enemy_velocity
         self.pos_y = self.rect.y
         self.pos_x = self.rect.x
 
@@ -61,7 +64,7 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.x = random.randrange(0, SCREEN_WIDTH)
 
     def update(self):
-        self.pos_y += self.enemy_pace
+        self.pos_y += self.game.pace * self.enemy_velocity
         self.rect.y = self.pos_y
         self.rect.x = self.pos_x
 
@@ -273,8 +276,9 @@ class Game:
         self.screen.blit(text_surface, (SCREEN_WIDTH - 150, 5))
 
     def tick(self):
-        # get ms between updates
-        self.pace = self.clock.tick(60) / 10
+        # Pace is based on ratio from optimal duration, e.g. pase = 1 = perfect, pase = 0.5 = half speed
+        # This to compensate for slower devices but keep same velocity of sprites
+        self.pace = self.clock.tick(FPS) / OPTIMAL_MS_PER_TICK
 
 
 async def game_loop():
