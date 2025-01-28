@@ -249,10 +249,11 @@ class Game:
 
         self.all_sprites_list.update()
         for bullet in self.bullet_list:
-            block_hit_list = pygame.sprite.spritecollide(bullet, self.enemy_list, True)
+            # This removes the enemy from the enemy_list
+            enemy_hit_list = pygame.sprite.spritecollide(bullet, self.enemy_list, True)
 
-            # For each block hit, remove the bullet and add to the score
-            for block in block_hit_list:
+            # For each enemy hit, remove the bullet and add to the score
+            for _ in enemy_hit_list:
                 self.bullet_list.remove(bullet)
                 self.all_sprites_list.remove(bullet)
                 self.score += 10
