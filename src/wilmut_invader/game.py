@@ -228,12 +228,7 @@ class Game:
                 if event.key == pygame.K_RIGHT:
                     self.player.go_right()
                 if event.key == pygame.K_RETURN or event.key == pygame.K_LCTRL or event.key == pygame.K_SPACE:
-                    self.SFX_SHOT.play()
-                    bullet = Bullet(self.IMG_SLIME, self)
-                    bullet.rect.x = self.player.rect.x + 30
-                    bullet.rect.y = self.player.rect.y
-                    self.all_sprites_list.add(bullet)
-                    self.bullet_list.add(bullet)
+                    self.player_shoot()
             elif pygame.mouse.get_pressed()[0]:
                 mouse_x, _ = pygame.mouse.get_pos()
                 if mouse_x < int(SCREEN_WIDTH * 0.3):
@@ -241,18 +236,12 @@ class Game:
                 elif mouse_x > int(SCREEN_WIDTH * 0.7):
                     self.player.go_right()
                 else:
-                    self.SFX_SHOT.play()
-                    bullet = Bullet(self.IMG_SLIME, self)
-                    bullet.rect.x = self.player.rect.x
-                    bullet.rect.y = self.player.rect.y
-                    self.all_sprites_list.add(bullet)
-                    self.bullet_list.add(bullet)
+                    self.player_shoot()
 
         self.all_sprites_list.update()
         for bullet in self.bullet_list:
             # This removes the enemy from the enemy_list
             enemy_hit_list = pygame.sprite.spritecollide(bullet, self.enemy_list, True)
-
 
             # For each enemy hit, remove the bullet and add to the score, and have a new enemy
             for _ in enemy_hit_list:
@@ -282,6 +271,14 @@ class Game:
         # Put scores
         text_surface = self.score_font.render(str(self.score), True, (255, 0, 0))
         self.screen.blit(text_surface, (SCREEN_WIDTH - 150, 5))
+
+    def player_shoot(self):
+        self.SFX_SHOT.play()
+        bullet = Bullet(self.IMG_SLIME, self)
+        bullet.rect.x = self.player.rect.x + 30
+        bullet.rect.y = self.player.rect.y
+        self.all_sprites_list.add(bullet)
+        self.bullet_list.add(bullet)
 
     def tick(self):
         # Pace is based on ratio from optimal duration, e.g. pase = 1 = perfect, pase = 0.5 = half speed
