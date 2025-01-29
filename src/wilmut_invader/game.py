@@ -200,7 +200,7 @@ class Game:
             image = random.choice([self.IMG_DANIEL, self.IMG_ALFONS, self.IMG_FIA])
         enemy = Enemy(image, self, enemy_velocity=velocity)
         # Set a random location for enemy far away from each others
-        while True:
+        for attempt in range(50):
             x, y = self.get_random_x_above_view(), self.get_random_y_above_view()
             if is_far_away(x, y, [(_.pos_x, _.pos_y) for _ in self.enemy_list.sprites()]):
                 enemy.pos_x = x
@@ -252,15 +252,16 @@ class Game:
         for bullet in self.bullet_list:
             # This removes the enemy from the enemy_list
             enemy_hit_list = pygame.sprite.spritecollide(bullet, self.enemy_list, True)
-            enemy = self.create_falling_enemy(velocity=0.3)
-            # TODO: Add enemies
-            # self.enemy_list.add(enemy)
 
-            # For each enemy hit, remove the bullet and add to the score
+
+            # For each enemy hit, remove the bullet and add to the score, and have a new enemy
             for _ in enemy_hit_list:
                 self.bullet_list.remove(bullet)
                 self.all_sprites_list.remove(bullet)
                 self.score += 10
+                enemy = self.create_falling_enemy(velocity=0.3)
+                self.enemy_list.add(enemy)
+                self.all_sprites_list.add(enemy)
 
             # Remove the bullet if it flies up off the screen
             if bullet.rect.y < -10:
