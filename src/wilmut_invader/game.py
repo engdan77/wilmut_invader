@@ -20,6 +20,8 @@ BLUE = (0, 0, 255)
 SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 480
 
+EVENT_PLAYER_RECOVER_INJURY = 9999
+
 FPS = 60
 OPTIMAL_MS_PER_TICK = int(1000 / FPS)
 
@@ -67,9 +69,11 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.y = self.pos_y
         self.rect.x = self.pos_x
 
-        if self.pos_y > SCREEN_HEIGHT - 60:
-            # TODO: Lose a life
-            ...
+        if self.pos_y > SCREEN_HEIGHT - 10:
+            self.game.lives -= 1
+            self.game.enemy_list.remove(self)
+            self.game.all_sprites_list.remove(self)
+            self.game.player.injury()
 
 
 class Player(pygame.sprite.Sprite):
@@ -81,10 +85,22 @@ class Player(pygame.sprite.Sprite):
         else:
             super().__init__()
         self.game = game
-        self.change_x = 0
+        self.org_image = image.copy()
         self.image = image
         self.image.set_colorkey((0, 0, 0, 255))
         self.rect = self.image.get_rect()
+        self.change_x = 0
+
+    def injury(self):
+        print('Enemy crossed the line')
+        color_image = pygame.Surface(self.image.get_size()).convert_alpha()
+        color_image.fill((250, 0, 0))
+        self.image.blit(color_image, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+        pygame.time.set_timer(EVENT_PLAYER_RECOVER_INJURY, millis=500, loops=1)
+
+    def recover_from_injury(self):
+        self.image = self.org_image.copy()
+        self.image.set_colorkey((0, 0, 0, 255))
 
     def update(self):
         self.rect.x += self.change_x
@@ -145,6 +161,8 @@ class Game:
         self.done = False
         self.clock = pygame.time.Clock()
         self.pace = 0  # The tick between frames to keep consistent speed across devices
+        self.lives = 5
+
         self.stage = 'intro'
 
         self.screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
@@ -242,6 +260,8 @@ class Game:
                     self.player.go_right()
                 else:
                     self.player_shoot()
+            elif event.type == EVENT_PLAYER_RECOVER_INJURY:
+                self.player.recover_from_injury()
 
         self.all_sprites_list.update()
         for bullet in self.bullet_list:
@@ -277,7 +297,7 @@ class Game:
         text_surface = self.score_font.render(str(self.score), True, (255, 0, 0))
         self.screen.blit(text_surface, (SCREEN_WIDTH - 150, 5))
 
-        # Put lifes
+        # Put lives
         self.draw_lives()
 
     def player_shoot(self):
@@ -290,10 +310,9 @@ class Game:
 
     def draw_lives(self):
         life = self.IMG_HEART
-        # life.set_colorkey((0, 0, 0, 255))
-        self.screen.blit(life, (50, 20))
+        for idx, live in enumerate(range(self.lives)):
+            self.screen.blit(life, (50 + idx * 30, 20))
         ...
-
 
     def tick(self):
         # Pace is based on ratio from optimal duration, e.g. pase = 1 = perfect, pase = 0.5 = half speed
