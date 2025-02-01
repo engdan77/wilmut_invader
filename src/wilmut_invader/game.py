@@ -5,7 +5,6 @@
 # ]
 # ///
 import asyncio
-import itertools
 import math
 import sys
 import pygame
@@ -67,6 +66,10 @@ class Enemy(pygame.sprite.Sprite):
         self.pos_y += self.game.pace * self.enemy_velocity
         self.rect.y = self.pos_y
         self.rect.x = self.pos_x
+
+        if self.pos_y > SCREEN_HEIGHT - 60:
+            # TODO: Lose a life
+            ...
 
 
 class Player(pygame.sprite.Sprite):
@@ -153,6 +156,7 @@ class Game:
         self.IMG_ALFONS = pygame.image.load('img/alfons.png').convert()
         self.IMG_FIA = pygame.image.load('img/fia.png').convert()
         self.IMG_SLIME = pygame.image.load('img/slimeshot.png').convert()
+        self.IMG_HEART = pygame.image.load('img/heart.png').convert_alpha()
 
         self.SFX_SHOT = pygame.mixer.Sound("sfx/fart.ogg")
         self.score_font = pygame.font.Font('fonts/my.ttf', 60)
@@ -273,6 +277,9 @@ class Game:
         text_surface = self.score_font.render(str(self.score), True, (255, 0, 0))
         self.screen.blit(text_surface, (SCREEN_WIDTH - 150, 5))
 
+        # Put lifes
+        self.draw_lives()
+
     def player_shoot(self):
         self.SFX_SHOT.play()
         bullet = Bullet(self.IMG_SLIME, self)
@@ -280,6 +287,13 @@ class Game:
         bullet.rect.y = self.player.rect.y
         self.all_sprites_list.add(bullet)
         self.bullet_list.add(bullet)
+
+    def draw_lives(self):
+        life = self.IMG_HEART
+        # life.set_colorkey((0, 0, 0, 255))
+        self.screen.blit(life, (50, 20))
+        ...
+
 
     def tick(self):
         # Pace is based on ratio from optimal duration, e.g. pase = 1 = perfect, pase = 0.5 = half speed
