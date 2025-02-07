@@ -92,7 +92,7 @@ class Player(pygame.sprite.Sprite):
         self.change_x = 0
 
     def injury(self):
-        print('Enemy crossed the line')
+        self.game.SFX_OUCH.play()
         color_image = pygame.Surface(self.image.get_size()).convert_alpha()
         color_image.fill((250, 0, 0))
         self.image.blit(color_image, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
@@ -177,6 +177,7 @@ class Game:
         self.IMG_HEART = pygame.image.load('img/heart.png').convert_alpha()
 
         self.SFX_SHOT = pygame.mixer.Sound("sfx/fart.ogg")
+        self.SFX_OUCH = pygame.mixer.Sound("sfx/ouch.ogg")
         self.score_font = pygame.font.Font('fonts/my.ttf', 60)
 
     def intro(self, events):
