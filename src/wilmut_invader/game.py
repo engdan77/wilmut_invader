@@ -20,7 +20,8 @@ BLUE = (0, 0, 255)
 SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 480
 
-EVENT_PLAYER_RECOVER_INJURY = 9999
+EVENT_PLAYER_RECOVER_INJURY = 32
+EVENT_GAME_OVER = 64
 
 FPS = 60
 OPTIMAL_MS_PER_TICK = int(1000 / FPS)
@@ -200,6 +201,7 @@ class Game:
 
     def init_first_game(self):
         self.lives = 5
+        self.score = 0
 
         self.SFX_SHOT.play()
         # This is a list of every sprite. All blocks and the player enemy as well.
@@ -268,6 +270,8 @@ class Game:
                     self.player_shoot()
             elif event.type == EVENT_PLAYER_RECOVER_INJURY:
                 self.player.recover_from_injury()
+            elif event.type == EVENT_GAME_OVER:
+                self.stage = 'game_over'
 
         self.all_sprites_list.update()
         for bullet in self.bullet_list:
@@ -298,13 +302,15 @@ class Game:
         self.draw_lives()
         self.draw_shots_left()
 
-        if not self.lives:
-            self.stage = 'game_over'
+        if self.lives == 1:
+            pygame.time.set_timer(EVENT_GAME_OVER, millis=1500, loops=1)
 
     def game_over(self, events):
         self.screen.fill(BLACK)
         self.screen.blit(self.BG_GAME_OVER, (0, 0))
         pygame.display.update()
+        text_surface = self.score_font.render('Score ' + str(self.score), True, (255, 0, 0))
+        self.screen.blit(text_surface, (150, 300))
         for event in events:
             if event.type == pygame.QUIT:
                 self.done = True
