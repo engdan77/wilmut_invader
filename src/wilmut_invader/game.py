@@ -86,7 +86,7 @@ class Player(pygame.sprite.Sprite):
             super().__init__()
         self.game = game
         self.org_image = image.copy()
-        self.image = image
+        self.image = image.copy()
         self.image.set_colorkey((0, 0, 0, 255))
         self.rect = self.image.get_rect()
         self.change_x = 0
@@ -218,7 +218,6 @@ class Game:
             self.all_sprites_list.add(enemy)
 
         self.player = Player(self.IMG_WILMA, self)
-        # TODO: ensure that the player becomes normal after game over (not red)
 
         self.all_sprites_list.add(self.player)
         self.player.rect.y = 400
