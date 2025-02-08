@@ -164,13 +164,13 @@ class Game:
         self.lives = 5
         self.shots_left = 20
         self.score = 0
-
         self.stage = 'intro'
 
         self.screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
 
         self.BG_IMAGE = pygame.image.load('img/background.png')
         self.BG_INTRO = pygame.image.load('img/intro.png').convert()
+        self.BG_GAME_OVER = pygame.image.load('img/game_over.png').convert()
         self.IMG_WILMA = pygame.image.load('img/wilma.png').convert()
         self.IMG_DANIEL = pygame.image.load('img/daniel.png').convert()
         self.IMG_ALFONS = pygame.image.load('img/alfons.png').convert()
@@ -199,6 +199,8 @@ class Game:
                 self.stage = 'init_first_game'
 
     def init_first_game(self):
+        self.lives = 5
+
         self.SFX_SHOT.play()
         # This is a list of every sprite. All blocks and the player enemy as well.
         self.all_sprites_list = pygame.sprite.Group()
@@ -216,6 +218,8 @@ class Game:
             self.all_sprites_list.add(enemy)
 
         self.player = Player(self.IMG_WILMA, self)
+        # TODO: ensure that the player becomes normal after game over (not red)
+
         self.all_sprites_list.add(self.player)
         self.player.rect.y = 400
         start_music()
@@ -295,7 +299,27 @@ class Game:
         self.draw_lives()
         self.draw_shots_left()
 
+        if not self.lives:
+            self.stage = 'game_over'
+
+    def game_over(self, events):
+        self.screen.fill(BLACK)
+        self.screen.blit(self.BG_GAME_OVER, (0, 0))
+        pygame.display.update()
+        for event in events:
+            if event.type == pygame.QUIT:
+                self.done = True
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    self.done = True
+                if event.key == pygame.K_RETURN or event.key == pygame.K_LCTRL or event.key == pygame.K_SPACE:
+                    self.stage = 'init_first_game'
+            elif pygame.mouse.get_pressed()[0]:
+                self.stage = 'init_first_game'
+
     def player_shoot(self):
+        if self.shots_left:
+            self.shots_left -= 1
         self.SFX_SHOT.play()
         bullet = Bullet(self.IMG_SLIME, self)
         bullet.rect.x = self.player.rect.x + 30
@@ -347,6 +371,8 @@ async def game_loop():
             game.init_first_game()
         elif game.stage == 'run_first_game':
             game.run_first_game(events)
+        elif game.stage == 'game_over':
+            game.game_over(events)
 
         # Go ahead and update the screen with what we've drawn.
         pygame.display.flip()
