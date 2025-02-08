@@ -162,6 +162,8 @@ class Game:
         self.clock = pygame.time.Clock()
         self.pace = 0  # The tick between frames to keep consistent speed across devices
         self.lives = 5
+        self.shots_left = 20
+        self.score = 0
 
         self.stage = 'intro'
 
@@ -179,6 +181,7 @@ class Game:
         self.SFX_SHOT = pygame.mixer.Sound("sfx/fart.ogg")
         self.SFX_OUCH = pygame.mixer.Sound("sfx/ouch.ogg")
         self.score_font = pygame.font.Font('fonts/my.ttf', 60)
+        self.shots_font = pygame.font.Font('fonts/my.ttf', 18)
 
     def intro(self, events):
         self.screen.fill(WHITE)
@@ -214,7 +217,6 @@ class Game:
 
         self.player = Player(self.IMG_WILMA, self)
         self.all_sprites_list.add(self.player)
-        self.score = 0
         self.player.rect.y = 400
         start_music()
         self.stage = 'run_first_game'
@@ -283,23 +285,15 @@ class Game:
                 self.bullet_list.remove(bullet)
                 self.all_sprites_list.remove(bullet)
 
-        # Clear the screen
-        self.screen.fill(WHITE)
-
-        # Set background
-        self.screen.blit(self.BG_IMAGE, (0, 0))
-        pygame.display.update()
+        self.draw_background()
 
         # Draw all the spites
         self.enemy_list.update()
         self.all_sprites_list.draw(self.screen)
 
-        # Put scores
-        text_surface = self.score_font.render(str(self.score), True, (255, 0, 0))
-        self.screen.blit(text_surface, (SCREEN_WIDTH - 150, 5))
-
-        # Put lives
+        self.draw_scores()
         self.draw_lives()
+        self.draw_shots_left()
 
     def player_shoot(self):
         self.SFX_SHOT.play()
@@ -309,11 +303,29 @@ class Game:
         self.all_sprites_list.add(bullet)
         self.bullet_list.add(bullet)
 
+    def draw_background(self):
+        self.screen.fill(WHITE)
+        self.screen.blit(self.BG_IMAGE, (0, 0))
+        pygame.display.update()
+
+    def draw_scores(self):
+        # Put scores
+        text_surface = self.score_font.render(str(self.score), True, (255, 0, 0))
+        self.screen.blit(text_surface, (SCREEN_WIDTH - 150, 5))
+
     def draw_lives(self):
         life = self.IMG_HEART
         for idx, live in enumerate(range(self.lives)):
             self.screen.blit(life, (50 + idx * 30, 20))
-        ...
+
+    def draw_shots_left(self):
+        shot = self.IMG_SLIME
+        x = 280
+        y = 25
+        shot.set_colorkey((0, 0, 0, 255))
+        self.screen.blit(shot, (x, y))
+        text_surface = self.shots_font.render('x ' + str(self.shots_left), True, (0, 0, 0))
+        self.screen.blit(text_surface, (x + 23, y))
 
     def tick(self):
         # Pace is based on ratio from optimal duration, e.g. pase = 1 = perfect, pase = 0.5 = half speed
