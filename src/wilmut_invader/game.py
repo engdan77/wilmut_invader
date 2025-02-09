@@ -181,6 +181,8 @@ class Game:
 
         self.SFX_SHOT = pygame.mixer.Sound("sfx/fart.ogg")
         self.SFX_OUCH = pygame.mixer.Sound("sfx/ouch.ogg")
+        self.OH_NO = pygame.mixer.Sound("sfx/oh_no.ogg")
+        self.SFX_LETS_GO = pygame.mixer.Sound("sfx/lets_go.ogg")
         self.score_font = pygame.font.Font('fonts/my.ttf', 60)
         self.shots_font = pygame.font.Font('fonts/my.ttf', 18)
 
@@ -202,8 +204,9 @@ class Game:
     def init_first_game(self):
         self.lives = 5
         self.score = 0
+        self.shots_left = 20
 
-        self.SFX_SHOT.play()
+        self.SFX_LETS_GO.play()
         # This is a list of every sprite. All blocks and the player enemy as well.
         self.all_sprites_list = pygame.sprite.Group()
 
@@ -323,7 +326,11 @@ class Game:
                 self.stage = 'init_first_game'
 
     def player_shoot(self):
-        if self.shots_left:
+        print(self.shots_left)
+        if self.shots_left == 0:
+            self.OH_NO.play()
+            return
+        if self.shots_left > 0:
             self.shots_left -= 1
         self.SFX_SHOT.play()
         bullet = Bullet(self.IMG_SLIME, self)
