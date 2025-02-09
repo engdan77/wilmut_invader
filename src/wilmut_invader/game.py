@@ -26,6 +26,8 @@ EVENT_GAME_OVER = 64
 FPS = 60
 OPTIMAL_MS_PER_TICK = int(1000 / FPS)
 
+SHOTS = 50
+LIVES = 5
 
 class Block(pygame.sprite.Sprite):
     """ This class represents the block. """
@@ -162,8 +164,8 @@ class Game:
         self.done = False
         self.clock = pygame.time.Clock()
         self.pace = 0  # The tick between frames to keep consistent speed across devices
-        self.lives = 5
-        self.shots_left = 20
+        self.lives = LIVES
+        self.shots_left = SHOTS
         self.score = 0
         self.stage = 'intro'
 
@@ -202,9 +204,9 @@ class Game:
                 self.stage = 'init_first_game'
 
     def init_first_game(self):
-        self.lives = 5
+        self.lives = LIVES
         self.score = 0
-        self.shots_left = 20
+        self.shots_left = SHOTS
 
         self.SFX_LETS_GO.play()
         # This is a list of every sprite. All blocks and the player enemy as well.
