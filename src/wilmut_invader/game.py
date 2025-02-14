@@ -22,12 +22,14 @@ SCREEN_HEIGHT = 480
 
 EVENT_PLAYER_RECOVER_INJURY = 32
 EVENT_GAME_OVER = 64
+EVENT_CREATE_ITEM = 128
 
 FPS = 60
 OPTIMAL_MS_PER_TICK = int(1000 / FPS)
 
 SHOTS = 50
 LIVES = 5
+
 
 class Block(pygame.sprite.Sprite):
     """ This class represents the block. """
@@ -77,6 +79,43 @@ class Enemy(pygame.sprite.Sprite):
             self.game.enemy_list.remove(self)
             self.game.all_sprites_list.remove(self)
             self.game.player.injury()
+
+
+class Item(pygame.sprite.Sprite):
+    """ This class represents the block. """
+
+    def __init__(self, image, game, item_velocity=0.5):
+        if PY2:
+            super(Item, self).__init__()
+        else:
+            super().__init__()
+        self.game = game
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.item_velocity = item_velocity
+        self.pos_y = self.rect.y
+        self.pos_x = self.rect.x
+        self.reset_pos()
+        print('create item')
+
+    def reset_pos(self):
+        """ Reset position to the top of the screen, at a random x location.
+        Called by update() or the main program loop if there is a collision.
+        """
+        self.rect.y = random.randint(-1200, -20)
+        self.rect.x = random.randint(50, SCREEN_WIDTH-50)
+        self.pos_y = self.rect.y
+        self.pos_x = self.rect.x
+
+    def update(self):
+        self.pos_y += self.game.pace * self.item_velocity
+        self.rect.y = self.pos_y
+        self.rect.x = self.pos_x
+
+        if self.pos_y > SCREEN_HEIGHT - 10:
+            self.game.item_list.remove(self)
+            self.game.all_sprites_list.remove(self)
+            self.game.item_scheduled = False
 
 
 class Player(pygame.sprite.Sprite):
@@ -168,6 +207,8 @@ class Game:
         self.shots_left = SHOTS
         self.score = 0
         self.stage = 'intro'
+        self.game_over_scheduled = False
+        self.item_scheduled = False
 
         self.screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
 
@@ -180,6 +221,7 @@ class Game:
         self.IMG_FIA = pygame.image.load('img/fia.png').convert()
         self.IMG_SLIME = pygame.image.load('img/slimeshot.png').convert()
         self.IMG_HEART = pygame.image.load('img/heart.png').convert_alpha()
+        self.IMG_EXTRA_SLIME = pygame.image.load('img/extra_slime.png').convert_alpha()
 
         self.SFX_SHOT = pygame.mixer.Sound("sfx/fart.ogg")
         self.SFX_OUCH = pygame.mixer.Sound("sfx/ouch.ogg")
@@ -215,6 +257,9 @@ class Game:
         # List of each enemy in the game
         self.enemy_list = pygame.sprite.Group()
 
+        # List of each item in the game
+        self.item_list = pygame.sprite.Group()
+
         # List of each bullet
         self.bullet_list = pygame.sprite.Group()
 
@@ -243,6 +288,10 @@ class Game:
                 enemy.pos_y = y
                 break
         return enemy
+
+    def create_falling_item(self, velocity=0.5, image=None):
+        item = Item(image, self, item_velocity=velocity)
+        return item
 
     def get_random_y_above_view(self):
         # return random.randint(60, 350)
@@ -277,6 +326,10 @@ class Game:
                 self.player.recover_from_injury()
             elif event.type == EVENT_GAME_OVER:
                 self.stage = 'game_over'
+            elif event.type == EVENT_CREATE_ITEM:
+                item = self.create_falling_item(velocity=0.5, image=self.IMG_EXTRA_SLIME)
+                self.item_list.add(item)
+                self.all_sprites_list.add(item)
 
         self.all_sprites_list.update()
         for bullet in self.bullet_list:
@@ -301,14 +354,22 @@ class Game:
 
         # Draw all the spites
         self.enemy_list.update()
+        self.item_list.update()
         self.all_sprites_list.draw(self.screen)
 
         self.draw_scores()
         self.draw_lives()
         self.draw_shots_left()
 
-        if self.lives == 1:
-            pygame.time.set_timer(EVENT_GAME_OVER, millis=1500, loops=1)
+        if self.lives == 1 and not self.game_over_scheduled:
+            self.game_over_scheduled = True
+            pygame.time.set_timer(EVENT_GAME_OVER, millis=3000, loops=1)
+
+        # Ensure new items get created
+        if not self.item_scheduled:
+            self.item_scheduled = True
+            print('create event for falling item')
+            pygame.time.set_timer(EVENT_CREATE_ITEM, millis=random.randint(10000, 30000), loops=1)
 
     def game_over(self, events):
         self.screen.fill(BLACK)
@@ -328,7 +389,6 @@ class Game:
                 self.stage = 'init_first_game'
 
     def player_shoot(self):
-        print(self.shots_left)
         if self.shots_left == 0:
             self.OH_NO.play()
             return
