@@ -31,6 +31,11 @@ SHOTS = 50
 LIVES = 5
 
 
+class ItemType:
+    SLIME = 1
+    LIFE = 2
+
+
 class Block(pygame.sprite.Sprite):
     """ This class represents the block. """
 
@@ -84,11 +89,12 @@ class Enemy(pygame.sprite.Sprite):
 class Item(pygame.sprite.Sprite):
     """ This class represents the block. """
 
-    def __init__(self, image, game, item_velocity=0.5):
+    def __init__(self, image, game, item_velocity=0.5, item_type=ItemType.SLIME):
         if PY2:
             super(Item, self).__init__()
         else:
             super().__init__()
+        self.item_type = item_type
         self.game = game
         self.image = image
         self.rect = self.image.get_rect()
@@ -96,12 +102,8 @@ class Item(pygame.sprite.Sprite):
         self.pos_y = self.rect.y
         self.pos_x = self.rect.x
         self.reset_pos()
-        print('create item')
 
     def reset_pos(self):
-        """ Reset position to the top of the screen, at a random x location.
-        Called by update() or the main program loop if there is a collision.
-        """
         self.rect.y = random.randint(-1200, -20)
         self.rect.x = random.randint(50, SCREEN_WIDTH-50)
         self.pos_y = self.rect.y
@@ -289,7 +291,9 @@ class Game:
                 break
         return enemy
 
-    def create_falling_item(self, velocity=0.5, image=None):
+    def create_falling_item(self):
+        velocity = 0.5
+        image = self.IMG_EXTRA_SLIME
         item = Item(image, self, item_velocity=velocity)
         return item
 
@@ -327,7 +331,7 @@ class Game:
             elif event.type == EVENT_GAME_OVER:
                 self.stage = 'game_over'
             elif event.type == EVENT_CREATE_ITEM:
-                item = self.create_falling_item(velocity=0.5, image=self.IMG_EXTRA_SLIME)
+                item = self.create_falling_item()
                 self.item_list.add(item)
                 self.all_sprites_list.add(item)
 
@@ -350,6 +354,12 @@ class Game:
                 self.bullet_list.remove(bullet)
                 self.all_sprites_list.remove(bullet)
 
+        item_hit_list = pygame.sprite.spritecollide(self.player, self.item_list, True)
+        for item in item_hit_list:
+            if item.item_type == ItemType.SLIME:
+                self.shots_left += 100
+                self.item_scheduled = False
+
         self.draw_background()
 
         # Draw all the spites
@@ -368,7 +378,6 @@ class Game:
         # Ensure new items get created
         if not self.item_scheduled:
             self.item_scheduled = True
-            print('create event for falling item')
             pygame.time.set_timer(EVENT_CREATE_ITEM, millis=random.randint(10000, 30000), loops=1)
 
     def game_over(self, events):
