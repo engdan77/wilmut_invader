@@ -131,7 +131,7 @@ class Item(pygame.sprite.Sprite):
 
     def player_caught(self):
         if self.item_type == ItemType.SLIME:
-            self.game.shots_left += 100
+            self.game.shots_left += 30
         elif self.item_type == ItemType.LIFE:
             if self.game.lives < 5:
                 self.game.lives += 1
@@ -314,16 +314,19 @@ class Game:
         return enemy
 
     def create_falling_item(self):
-        velocity = 0.5
+        self.item_scheduled = False
+        velocity = random.randint(40, 60) / 100
         random_pick = random.randint(1, 100)
         # 20% chance for slime
         # 80% chance nothing
-        if 0 <= random_pick <= 50:
+        print('Random item pick: ' + str(random_pick))
+        if 0 <= random_pick <= 30:
             item_type = ItemType.SLIME
-        elif 50 <= random_pick <= 100:
+        elif 30 <= random_pick <= 45:
             item_type = ItemType.LIFE
         else:
             return None
+        print(item_type)
         item = Item(self, item_velocity=velocity, item_type=item_type)
         return item
 
@@ -411,7 +414,7 @@ class Game:
         # Ensure new items get created
         if not self.item_scheduled:
             self.item_scheduled = True
-            pygame.time.set_timer(EVENT_CREATE_ITEM, millis=random.randint(3000, 6000), loops=1)
+            pygame.time.set_timer(EVENT_CREATE_ITEM, millis=random.randint(5000, 10000), loops=1)
 
         pygame.display.update()
 
