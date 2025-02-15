@@ -30,6 +30,8 @@ OPTIMAL_MS_PER_TICK = int(1000 / FPS)
 SHOTS = 50
 LIVES = 5
 
+BASE_ENEMY_VELOCITY = 0.3  # Adjust to speed up the base speed
+
 
 class ItemType:
     SLIME = 1
@@ -54,7 +56,7 @@ class Block(pygame.sprite.Sprite):
 class Enemy(pygame.sprite.Sprite):
     """ This class represents the block. """
 
-    def __init__(self, image, game, enemy_velocity=0.3):
+    def __init__(self, image, game):
         if PY2:
             super(Enemy, self).__init__()
         else:
@@ -63,7 +65,9 @@ class Enemy(pygame.sprite.Sprite):
         self.image = image
         self.image.set_colorkey((0, 0, 0, 255))
         self.rect = self.image.get_rect()
-        self.enemy_velocity = enemy_velocity
+        random_extra_speed_factor = (random.randint(1, 30) / 100) + 1
+        game_enemy_velocity = self.game.enemy_speedup_factor + 1
+        self.enemy_velocity = BASE_ENEMY_VELOCITY * random_extra_speed_factor * game_enemy_velocity
         self.pos_y = self.rect.y
         self.pos_x = self.rect.x
 
@@ -107,7 +111,6 @@ class Item(pygame.sprite.Sprite):
         self.pos_y = self.rect.y
         self.pos_x = self.rect.x
         self.reset_pos()
-        print('Item created')
 
     def reset_pos(self):
         self.rect.y = random.randint(-1200, -20)
@@ -225,6 +228,7 @@ class Game:
         self.stage = 'intro'
         self.game_over_scheduled = False
         self.item_scheduled = False
+        self.enemy_speedup_factor = 0
 
         self.screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
 
@@ -281,7 +285,7 @@ class Game:
         self.bullet_list = pygame.sprite.Group()
 
         for i in range(15):
-            enemy = self.create_falling_enemy(velocity=0.3)
+            enemy = self.create_falling_enemy()
             # Add the enemy to the list of objects
             self.enemy_list.add(enemy)
             self.all_sprites_list.add(enemy)
@@ -293,10 +297,10 @@ class Game:
         start_music()
         self.stage = 'run_first_game'
 
-    def create_falling_enemy(self, velocity=0.3, image=None):
+    def create_falling_enemy(self, image=None):
         if not image:
             image = random.choice([self.IMG_DANIEL, self.IMG_ALFONS, self.IMG_FIA])
-        enemy = Enemy(image, self, enemy_velocity=velocity)
+        enemy = Enemy(image, self)
         # Set a random location for enemy far away from each others
         for attempt in range(50):
             x, y = self.get_random_x_above_view(), self.get_random_y_above_view()
@@ -370,7 +374,7 @@ class Game:
                 self.bullet_list.remove(bullet)
                 self.all_sprites_list.remove(bullet)
                 self.score += 10
-                enemy = self.create_falling_enemy(velocity=0.3)
+                enemy = self.create_falling_enemy()
                 self.enemy_list.add(enemy)
                 self.all_sprites_list.add(enemy)
 
