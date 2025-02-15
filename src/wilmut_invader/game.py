@@ -319,14 +319,12 @@ class Game:
         random_pick = random.randint(1, 100)
         # 20% chance for slime
         # 80% chance nothing
-        print('Random item pick: ' + str(random_pick))
         if 0 <= random_pick <= 30:
             item_type = ItemType.SLIME
         elif 30 <= random_pick <= 45:
             item_type = ItemType.LIFE
         else:
             return None
-        print(item_type)
         item = Item(self, item_velocity=velocity, item_type=item_type)
         return item
 
