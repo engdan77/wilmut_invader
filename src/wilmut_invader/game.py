@@ -89,19 +89,25 @@ class Enemy(pygame.sprite.Sprite):
 class Item(pygame.sprite.Sprite):
     """ This class represents the block. """
 
-    def __init__(self, image, game, item_velocity=0.5, item_type=ItemType.SLIME):
+    def __init__(self, game, item_velocity=0.5, item_type=ItemType.SLIME):
         if PY2:
             super(Item, self).__init__()
         else:
             super().__init__()
-        self.item_type = item_type
+
         self.game = game
-        self.image = image
+        self.item_type = item_type
+        if item_type == ItemType.SLIME:
+            self.image = self.game.IMG_EXTRA_SLIME
+        if item_type == ItemType.LIFE:
+            self.image = self.game.IMG_EXTRA_LIFE
+
         self.rect = self.image.get_rect()
         self.item_velocity = item_velocity
         self.pos_y = self.rect.y
         self.pos_x = self.rect.x
         self.reset_pos()
+        print('Item created')
 
     def reset_pos(self):
         self.rect.y = random.randint(-1200, -20)
@@ -118,6 +124,14 @@ class Item(pygame.sprite.Sprite):
             self.game.item_list.remove(self)
             self.game.all_sprites_list.remove(self)
             self.game.item_scheduled = False
+
+    def player_caught(self):
+        if self.item_type == ItemType.SLIME:
+            self.game.shots_left += 100
+        elif self.item_type == ItemType.LIFE:
+            if self.game.lives < 5:
+                self.game.lives += 1
+        self.game.item_scheduled = False
 
 
 class Player(pygame.sprite.Sprite):
@@ -224,6 +238,7 @@ class Game:
         self.IMG_SLIME = pygame.image.load('img/slimeshot.png').convert()
         self.IMG_HEART = pygame.image.load('img/heart.png').convert_alpha()
         self.IMG_EXTRA_SLIME = pygame.image.load('img/extra_slime.png').convert_alpha()
+        self.IMG_EXTRA_LIFE = pygame.image.load('img/extra_life.png').convert_alpha()
 
         self.SFX_SHOT = pygame.mixer.Sound("sfx/fart.ogg")
         self.SFX_OUCH = pygame.mixer.Sound("sfx/ouch.ogg")
@@ -293,8 +308,16 @@ class Game:
 
     def create_falling_item(self):
         velocity = 0.5
-        image = self.IMG_EXTRA_SLIME
-        item = Item(image, self, item_velocity=velocity)
+        random_pick = random.randint(1, 100)
+        # 20% chance for slime
+        # 80% chance nothing
+        if 0 <= random_pick <= 50:
+            item_type = ItemType.SLIME
+        elif 50 <= random_pick <= 100:
+            item_type = ItemType.LIFE
+        else:
+            return None
+        item = Item(self, item_velocity=velocity, item_type=item_type)
         return item
 
     def get_random_y_above_view(self):
@@ -332,8 +355,10 @@ class Game:
                 self.stage = 'game_over'
             elif event.type == EVENT_CREATE_ITEM:
                 item = self.create_falling_item()
-                self.item_list.add(item)
-                self.all_sprites_list.add(item)
+                # Only create falling item of random says so
+                if item:
+                    self.item_list.add(item)
+                    self.all_sprites_list.add(item)
 
         self.all_sprites_list.update()
         for bullet in self.bullet_list:
@@ -356,9 +381,7 @@ class Game:
 
         item_hit_list = pygame.sprite.spritecollide(self.player, self.item_list, True)
         for item in item_hit_list:
-            if item.item_type == ItemType.SLIME:
-                self.shots_left += 100
-                self.item_scheduled = False
+            item.player_caught()
 
         self.draw_background()
 
@@ -378,7 +401,7 @@ class Game:
         # Ensure new items get created
         if not self.item_scheduled:
             self.item_scheduled = True
-            pygame.time.set_timer(EVENT_CREATE_ITEM, millis=random.randint(10000, 30000), loops=1)
+            pygame.time.set_timer(EVENT_CREATE_ITEM, millis=random.randint(3000, 6000), loops=1)
 
     def game_over(self, events):
         self.screen.fill(BLACK)
