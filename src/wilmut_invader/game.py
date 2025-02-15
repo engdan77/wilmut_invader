@@ -20,6 +20,7 @@ BLUE = (0, 0, 255)
 SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 480
 
+EVENT_SPEEDUP_ENEMIES = 16
 EVENT_PLAYER_RECOVER_INJURY = 32
 EVENT_GAME_OVER = 64
 EVENT_CREATE_ITEM = 128
@@ -297,6 +298,8 @@ class Game:
         start_music()
         self.stage = 'run_first_game'
 
+        pygame.time.set_timer(EVENT_SPEEDUP_ENEMIES, millis=15000, loops=0)
+
     def create_falling_enemy(self, image=None):
         if not image:
             image = random.choice([self.IMG_DANIEL, self.IMG_ALFONS, self.IMG_FIA])
@@ -363,6 +366,9 @@ class Game:
                 if item:
                     self.item_list.add(item)
                     self.all_sprites_list.add(item)
+            elif event.type == EVENT_SPEEDUP_ENEMIES:
+                random_factor = random.randint(5, 20) / 100
+                self.enemy_speedup_factor += random_factor
 
         self.all_sprites_list.update()
         for bullet in self.bullet_list:
@@ -410,6 +416,7 @@ class Game:
         pygame.display.update()
 
     def game_over(self, events):
+        self.enemy_speedup_factor = 0
         self.screen.fill(BLACK)
         self.screen.blit(self.BG_GAME_OVER, (0, 0))
         text_surface = self.score_font.render('Score ' + str(self.score), True, (255, 0, 0))
