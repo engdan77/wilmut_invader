@@ -408,9 +408,8 @@ class Game:
     def game_over(self, events):
         self.screen.fill(BLACK)
         self.screen.blit(self.BG_GAME_OVER, (0, 0))
-        pygame.display.update()
         text_surface = self.score_font.render('Score ' + str(self.score), True, (255, 0, 0))
-        self.screen.blit(text_surface, (150, 300))
+        self.screen.blit(text_surface, (125, 300))
         for event in events:
             if event.type == pygame.QUIT:
                 self.done = True
