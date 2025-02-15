@@ -403,6 +403,8 @@ class Game:
             self.item_scheduled = True
             pygame.time.set_timer(EVENT_CREATE_ITEM, millis=random.randint(3000, 6000), loops=1)
 
+        pygame.display.update()
+
     def game_over(self, events):
         self.screen.fill(BLACK)
         self.screen.blit(self.BG_GAME_OVER, (0, 0))
@@ -436,7 +438,6 @@ class Game:
     def draw_background(self):
         self.screen.fill(WHITE)
         self.screen.blit(self.BG_IMAGE, (0, 0))
-        pygame.display.update()
 
     def draw_scores(self):
         # Put scores
