@@ -10,7 +10,7 @@ import sys
 import pygame
 import random
 
-__version__ = '2025.2.1'
+__version__ = '2025.2.3'
 
 PY2 = int(sys.version.split('.').pop(0)) == 2
 
@@ -324,9 +324,9 @@ class Game:
         random_pick = random.randint(1, 100)
         # 20% chance for slime
         # 80% chance nothing
-        if 0 <= random_pick <= 30:
+        if 0 <= random_pick <= 40:
             item_type = ItemType.SLIME
-        elif 30 <= random_pick <= 45:
+        elif 40 <= random_pick <= 50:
             item_type = ItemType.LIFE
         else:
             return None
@@ -412,9 +412,10 @@ class Game:
         if DEBUG:
             self.draw_debug()
 
-        if self.lives == 1 and not self.game_over_scheduled:
+        print(self.lives)
+        if self.lives < 1 and not self.game_over_scheduled:
             self.game_over_scheduled = True
-            pygame.time.set_timer(EVENT_GAME_OVER, millis=3000, loops=1)
+            pygame.time.set_timer(EVENT_GAME_OVER, millis=1000, loops=1)
 
         # Ensure new items get created
         if not self.item_scheduled:
@@ -424,6 +425,7 @@ class Game:
         pygame.display.update()
 
     def game_over(self, events):
+        self.game_over_scheduled = False
         self.enemy_speedup_factor = 0
         self.screen.fill(BLACK)
         self.screen.blit(self.BG_GAME_OVER, (0, 0))
