@@ -10,7 +10,7 @@ import sys
 import pygame
 import random
 
-__version__ = '2025.2.3'
+__version__ = '2025.2.4'
 
 PY2 = int(sys.version.split('.').pop(0)) == 2
 
@@ -41,6 +41,7 @@ BASE_ENEMY_VELOCITY = 0.3  # Adjust to speed up the base speed
 class ItemType:
     SLIME = 1
     LIFE = 2
+    SUPER = 3
 
 
 class Block(pygame.sprite.Sprite):
@@ -110,6 +111,8 @@ class Item(pygame.sprite.Sprite):
             self.image = self.game.IMG_EXTRA_SLIME
         if item_type == ItemType.LIFE:
             self.image = self.game.IMG_EXTRA_LIFE
+        if item_type == ItemType.SUPER:
+            self.image = self.game.IMG_EXTRA_SUPER
 
         self.rect = self.image.get_rect()
         self.item_velocity = item_velocity
@@ -248,6 +251,7 @@ class Game:
         self.IMG_HEART = pygame.image.load('img/heart.png').convert_alpha()
         self.IMG_EXTRA_SLIME = pygame.image.load('img/extra_slime.png').convert_alpha()
         self.IMG_EXTRA_LIFE = pygame.image.load('img/extra_life.png').convert_alpha()
+        self.IMG_EXTRA_SUPER = pygame.image.load('img/superw.png').convert_alpha()
 
         self.SFX_SHOT = pygame.mixer.Sound("sfx/fart.ogg")
         self.SFX_OUCH = pygame.mixer.Sound("sfx/ouch.ogg")
@@ -328,6 +332,8 @@ class Game:
             item_type = ItemType.SLIME
         elif 40 <= random_pick <= 50:
             item_type = ItemType.LIFE
+        elif 50 <= random_pick <= 60:
+            item_type = ItemType.SUPER
         else:
             return None
         item = Item(self, item_velocity=velocity, item_type=item_type)
@@ -412,7 +418,6 @@ class Game:
         if DEBUG:
             self.draw_debug()
 
-        print(self.lives)
         if self.lives < 1 and not self.game_over_scheduled:
             self.game_over_scheduled = True
             pygame.time.set_timer(EVENT_GAME_OVER, millis=1000, loops=1)
