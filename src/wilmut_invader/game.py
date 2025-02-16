@@ -10,7 +10,7 @@ import sys
 import pygame
 import random
 
-__version__ = '2025.2.4'
+__version__ = '2025.2.5'
 
 PY2 = int(sys.version.split('.').pop(0)) == 2
 
@@ -24,6 +24,7 @@ BLUE = (0, 0, 255)
 SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 480
 
+EVENT_RESTORE_USER = 4
 EVENT_DECREASE_TIME_SUPER = 8
 EVENT_SPEEDUP_ENEMIES = 16
 EVENT_PLAYER_RECOVER_INJURY = 32
@@ -144,9 +145,11 @@ class Item(pygame.sprite.Sprite):
             if self.game.lives < 5:
                 self.game.lives += 1
         elif self.item_type == ItemType.SUPER and self.game.super_time_secs_left < 1:
-            print('start super timer')
             self.game.super_time_secs_left = 30
+            self.game.player.become_super()
             pygame.time.set_timer(EVENT_DECREASE_TIME_SUPER, millis=1000, loops=30)
+            pygame.time.set_timer(EVENT_RESTORE_USER, millis=30000, loops=1)
+
         self.game.item_scheduled = False
 
 
@@ -172,9 +175,15 @@ class Player(pygame.sprite.Sprite):
         self.image.blit(color_image, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
         pygame.time.set_timer(EVENT_PLAYER_RECOVER_INJURY, millis=500, loops=1)
 
-    def recover_from_injury(self):
+    def restore_player(self):
         self.image = self.org_image.copy()
         self.image.set_colorkey((0, 0, 0, 255))
+
+    def become_super(self):
+        color_image = pygame.Surface(self.image.get_size()).convert_alpha()
+        color_image.fill((0, 128, 0))
+        self.image.blit(color_image, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+        # pygame.time.set_timer(EVENT_PLAYER_RECOVER_INJURY, millis=500, loops=1)
 
     def update(self):
         self.rect.x += self.change_x
@@ -377,7 +386,7 @@ class Game:
                 else:
                     self.player_shoot()
             elif event.type == EVENT_PLAYER_RECOVER_INJURY:
-                self.player.recover_from_injury()
+                self.player.restore_player()
             elif event.type == EVENT_GAME_OVER:
                 self.stage = 'game_over'
             elif event.type == EVENT_CREATE_ITEM:
@@ -391,6 +400,8 @@ class Game:
             elif event.type == EVENT_SPEEDUP_ENEMIES:
                 random_factor = random.randint(5, 20) / 100
                 self.enemy_speedup_factor += random_factor
+            elif event.type == EVENT_RESTORE_USER:
+                self.player.restore_player()
 
         self.all_sprites_list.update()
         for bullet in self.bullet_list:
