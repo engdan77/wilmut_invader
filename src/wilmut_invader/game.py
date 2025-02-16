@@ -10,7 +10,11 @@ import sys
 import pygame
 import random
 
+__version__ = '2025.2.1'
+
 PY2 = int(sys.version.split('.').pop(0)) == 2
+
+DEBUG = True
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -251,6 +255,7 @@ class Game:
         self.SFX_LETS_GO = pygame.mixer.Sound("sfx/lets_go.ogg")
         self.score_font = pygame.font.Font('fonts/my.ttf', 60)
         self.shots_font = pygame.font.Font('fonts/my.ttf', 18)
+        self.debug_font = pygame.font.SysFont("Arial", 12)
 
     def intro(self, events):
         self.screen.fill(WHITE)
@@ -404,6 +409,8 @@ class Game:
         self.draw_scores()
         self.draw_lives()
         self.draw_shots_left()
+        if DEBUG:
+            self.draw_debug()
 
         if self.lives == 1 and not self.game_over_scheduled:
             self.game_over_scheduled = True
@@ -468,6 +475,14 @@ class Game:
         self.screen.blit(shot, (x, y))
         text_surface = self.shots_font.render('x ' + str(self.shots_left), True, (0, 0, 0))
         self.screen.blit(text_surface, (x + 23, y))
+
+    def draw_debug(self):
+        x = 5
+        y = 2
+        fps = int(self.clock.get_fps())
+        text = __version__ + ' FPS: ' + str(fps)
+        text_surface = self.debug_font.render(text, True, (0, 0, 0))
+        self.screen.blit(text_surface, (x, y))
 
     def tick(self):
         # Pace is based on ratio from optimal duration, e.g. pase = 1 = perfect, pase = 0.5 = half speed
