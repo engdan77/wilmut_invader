@@ -425,6 +425,8 @@ class Game:
         self.draw_scores()
         self.draw_lives()
         self.draw_shots_left()
+        self.draw_super_time_left()
+
         if DEBUG:
             self.draw_debug()
 
@@ -462,8 +464,11 @@ class Game:
         if self.super_time_secs_left > 0:
             self.SFX_SHOT.play()
             bullet = Bullet(self.IMG_POOP, self)
-            bullet.rect.x = self.player.rect.x + 40
-            bullet.rect.y = self.player.rect.y
+            bullet.rect.x = self.player.rect.x + 30
+            bullet.rect.y = self.player.rect.y - 30
+            self.all_sprites_list.add(bullet)
+            self.bullet_list.add(bullet)
+            return
         if self.shots_left == 0:
             self.OH_NO.play()
             return
