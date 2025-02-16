@@ -24,6 +24,7 @@ BLUE = (0, 0, 255)
 SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 480
 
+EVENT_DECREASE_TIME_SUPER = 8
 EVENT_SPEEDUP_ENEMIES = 16
 EVENT_PLAYER_RECOVER_INJURY = 32
 EVENT_GAME_OVER = 64
@@ -142,6 +143,10 @@ class Item(pygame.sprite.Sprite):
         elif self.item_type == ItemType.LIFE:
             if self.game.lives < 5:
                 self.game.lives += 1
+        elif self.item_type == ItemType.SUPER and self.game.super_time_secs_left < 1:
+            print('start super timer')
+            self.game.super_time_secs_left = 30
+            pygame.time.set_timer(EVENT_DECREASE_TIME_SUPER, millis=1000, loops=30)
         self.game.item_scheduled = False
 
 
@@ -237,6 +242,7 @@ class Game:
         self.game_over_scheduled = False
         self.item_scheduled = False
         self.enemy_speedup_factor = 0
+        self.super_time_secs_left = 0
 
         self.screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
 
@@ -248,6 +254,7 @@ class Game:
         self.IMG_ALFONS = pygame.image.load('img/alfons.png').convert()
         self.IMG_FIA = pygame.image.load('img/fia.png').convert()
         self.IMG_SLIME = pygame.image.load('img/slimeshot.png').convert()
+        self.IMG_POOP = pygame.image.load('img/poopshot.png').convert_alpha()
         self.IMG_HEART = pygame.image.load('img/heart.png').convert_alpha()
         self.IMG_EXTRA_SLIME = pygame.image.load('img/extra_slime.png').convert_alpha()
         self.IMG_EXTRA_LIFE = pygame.image.load('img/extra_life.png').convert_alpha()
@@ -259,6 +266,7 @@ class Game:
         self.SFX_LETS_GO = pygame.mixer.Sound("sfx/lets_go.ogg")
         self.score_font = pygame.font.Font('fonts/my.ttf', 60)
         self.shots_font = pygame.font.Font('fonts/my.ttf', 18)
+        self.super_left_font = pygame.font.Font('fonts/my.ttf', 20)
         self.debug_font = pygame.font.SysFont("Arial", 12)
 
     def intro(self, events):
@@ -332,7 +340,7 @@ class Game:
             item_type = ItemType.SLIME
         elif 40 <= random_pick <= 50:
             item_type = ItemType.LIFE
-        elif 50 <= random_pick <= 60:
+        elif 50 <= random_pick <= 99:
             item_type = ItemType.SUPER
         else:
             return None
@@ -378,6 +386,8 @@ class Game:
                 if item:
                     self.item_list.add(item)
                     self.all_sprites_list.add(item)
+            elif event.type == EVENT_DECREASE_TIME_SUPER:
+                self.decrease_super_time_left()
             elif event.type == EVENT_SPEEDUP_ENEMIES:
                 random_factor = random.randint(5, 20) / 100
                 self.enemy_speedup_factor += random_factor
@@ -448,6 +458,12 @@ class Game:
                 self.stage = 'init_first_game'
 
     def player_shoot(self):
+        print(self.super_time_secs_left)
+        if self.super_time_secs_left > 0:
+            self.SFX_SHOT.play()
+            bullet = Bullet(self.IMG_POOP, self)
+            bullet.rect.x = self.player.rect.x + 40
+            bullet.rect.y = self.player.rect.y
         if self.shots_left == 0:
             self.OH_NO.play()
             return
@@ -483,13 +499,20 @@ class Game:
         text_surface = self.shots_font.render('x ' + str(self.shots_left), True, (0, 0, 0))
         self.screen.blit(text_surface, (x + 23, y))
 
+    def draw_super_time_left(self):
+        if not self.super_time_secs_left:
+            return
+        text_surface = self.super_left_font.render(str(self.super_time_secs_left), True, (0, 0, 0))
+        self.screen.blit(text_surface, (5, 440))
+
     def draw_debug(self):
-        x = 5
-        y = 2
         fps = int(self.clock.get_fps())
         text = __version__ + ' FPS: ' + str(fps)
         text_surface = self.debug_font.render(text, True, (0, 0, 0))
-        self.screen.blit(text_surface, (x, y))
+        self.screen.blit(text_surface, (5, 2))
+
+    def decrease_super_time_left(self):
+        self.super_time_secs_left -= 1
 
     def tick(self):
         # Pace is based on ratio from optimal duration, e.g. pase = 1 = perfect, pase = 0.5 = half speed
