@@ -19,10 +19,5 @@ wilmut-invader = "wilmut_invader:main.start"
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.hatch.build]
-include = [
-  "/src/data/*.csv",
-]
-
 [tool.ruff.format]
 quote-style = "single"
