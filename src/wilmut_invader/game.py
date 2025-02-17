@@ -11,7 +11,7 @@ import sys
 import pygame
 import random
 
-__version__ = '2025.2.5'
+__version__ = '2025.2.6'
 
 PY2 = int(sys.version.split('.').pop(0)) == 2
 
@@ -259,27 +259,28 @@ class Game:
 
         self.screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
 
+        # Adding GAME_PATH to ensure work regardless running as package using e.g. UV or a script, rather than using CWD
         self.BG_IMAGE = pygame.image.load(GAME_PATH + '/img/background.png')
-        self.BG_INTRO = pygame.image.load('img/intro.png').convert()
-        self.BG_GAME_OVER = pygame.image.load('img/game_over.png').convert()
-        self.IMG_WILMA = pygame.image.load('img/wilma.png').convert()
-        self.IMG_DANIEL = pygame.image.load('img/daniel.png').convert()
-        self.IMG_ALFONS = pygame.image.load('img/alfons.png').convert()
-        self.IMG_FIA = pygame.image.load('img/fia.png').convert()
-        self.IMG_SLIME = pygame.image.load('img/slimeshot.png').convert()
-        self.IMG_POOP = pygame.image.load('img/poopshot.png').convert_alpha()
-        self.IMG_HEART = pygame.image.load('img/heart.png').convert_alpha()
-        self.IMG_EXTRA_SLIME = pygame.image.load('img/extra_slime.png').convert_alpha()
-        self.IMG_EXTRA_LIFE = pygame.image.load('img/extra_life.png').convert_alpha()
-        self.IMG_EXTRA_SUPER = pygame.image.load('img/superw.png').convert_alpha()
+        self.BG_INTRO = pygame.image.load(GAME_PATH + '/img/intro.png').convert()
+        self.BG_GAME_OVER = pygame.image.load(GAME_PATH + '/img/game_over.png').convert()
+        self.IMG_WILMA = pygame.image.load(GAME_PATH + '/img/wilma.png').convert()
+        self.IMG_DANIEL = pygame.image.load(GAME_PATH + '/img/daniel.png').convert()
+        self.IMG_ALFONS = pygame.image.load(GAME_PATH + '/img/alfons.png').convert()
+        self.IMG_FIA = pygame.image.load(GAME_PATH + '/img/fia.png').convert()
+        self.IMG_SLIME = pygame.image.load(GAME_PATH + '/img/slimeshot.png').convert()
+        self.IMG_POOP = pygame.image.load(GAME_PATH + '/img/poopshot.png').convert_alpha()
+        self.IMG_HEART = pygame.image.load(GAME_PATH + '/img/heart.png').convert_alpha()
+        self.IMG_EXTRA_SLIME = pygame.image.load(GAME_PATH + '/img/extra_slime.png').convert_alpha()
+        self.IMG_EXTRA_LIFE = pygame.image.load(GAME_PATH + '/img/extra_life.png').convert_alpha()
+        self.IMG_EXTRA_SUPER = pygame.image.load(GAME_PATH + '/img/superw.png').convert_alpha()
 
-        self.SFX_SHOT = pygame.mixer.Sound("sfx/fart.ogg")
-        self.SFX_OUCH = pygame.mixer.Sound("sfx/ouch.ogg")
-        self.OH_NO = pygame.mixer.Sound("sfx/oh_no.ogg")
-        self.SFX_LETS_GO = pygame.mixer.Sound("sfx/lets_go.ogg")
-        self.score_font = pygame.font.Font('fonts/my.ttf', 60)
-        self.shots_font = pygame.font.Font('fonts/my.ttf', 18)
-        self.super_left_font = pygame.font.Font('fonts/my.ttf', 20)
+        self.SFX_SHOT = pygame.mixer.Sound(GAME_PATH + "/sfx/fart.ogg")
+        self.SFX_OUCH = pygame.mixer.Sound(GAME_PATH + "/sfx/ouch.ogg")
+        self.OH_NO = pygame.mixer.Sound(GAME_PATH + "/sfx/oh_no.ogg")
+        self.SFX_LETS_GO = pygame.mixer.Sound(GAME_PATH + "/sfx/lets_go.ogg")
+        self.score_font = pygame.font.Font(GAME_PATH + '/fonts/my.ttf', 60)
+        self.shots_font = pygame.font.Font(GAME_PATH + '/fonts/my.ttf', 18)
+        self.super_left_font = pygame.font.Font(GAME_PATH + '/fonts/my.ttf', 20)
         self.debug_font = pygame.font.SysFont("Arial", 12)
 
     def intro(self, events):
