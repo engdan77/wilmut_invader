@@ -238,7 +238,7 @@ def is_far_away(x1, y1, current_pos_list, screen_margins=50):
 
 
 def start_music():
-    pygame.mixer.music.load("sfx/rainingbullets_smaller.ogg")
+    pygame.mixer.music.load(GAME_PATH + "/sfx/rainingbullets_smaller.ogg")
     pygame.mixer.music.play(-1)
 
 
