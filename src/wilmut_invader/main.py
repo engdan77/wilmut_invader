@@ -39,6 +39,11 @@ def start():
     """Why all this? (Experimentation)
     ... attempt to make source compatible with Python2 to support OnionOS
     ... as well as Python3 using asyncio to support pygbag"""
+    try:
+        print('Changing into game directory')
+        os.chdir('src/wilmut_invader')
+    except FileNotFoundError:
+        pass
     python_version = int(sys.version.split('.').pop(0))
     if python_version == 3:
         print('Starting Python 3 version')
