@@ -31,6 +31,8 @@ def get_namespace_from_source(file='game.py', python2=False):
     if python2:
         source_code = py2to3(source_code)
     ns = {}
+    game_path = os.path.dirname(__file__)
+    ns['GAME_PATH'] = game_path
     exec(source_code, ns)
     return ns
 

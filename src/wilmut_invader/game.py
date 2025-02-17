@@ -6,6 +6,7 @@
 # ///
 import asyncio
 import math
+import os
 import sys
 import pygame
 import random
@@ -38,6 +39,9 @@ SHOTS = 50
 LIVES = 5
 
 BASE_ENEMY_VELOCITY = 0.3  # Adjust to speed up the base speed
+
+if 'GAME_PATH' not in globals():
+    GAME_PATH = os.path.dirname(os.path.realpath(__file__))
 
 
 class ItemType:
@@ -255,7 +259,7 @@ class Game:
 
         self.screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
 
-        self.BG_IMAGE = pygame.image.load('img/background.png')
+        self.BG_IMAGE = pygame.image.load(GAME_PATH + '/img/background.png')
         self.BG_INTRO = pygame.image.load('img/intro.png').convert()
         self.BG_GAME_OVER = pygame.image.load('img/game_over.png').convert()
         self.IMG_WILMA = pygame.image.load('img/wilma.png').convert()

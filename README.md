@@ -25,5 +25,8 @@ uv run src/wilmut_invader/build_onionos_port.py /Volumes/USB/
 
 #### From the source
 
-...
+```shell
+uvx --from git+https://github.com/engdan77/wilmut_invader.git wilmut-invader
+```
+
 
