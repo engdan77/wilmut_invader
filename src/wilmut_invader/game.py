@@ -185,7 +185,7 @@ class Player(pygame.sprite.Sprite):
 
     def become_super(self):
         color_image = pygame.Surface(self.image.get_size()).convert_alpha()
-        color_image.fill((0, 128, 0))
+        color_image.fill((0, 64, 0))
         self.image.blit(color_image, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
         # pygame.time.set_timer(EVENT_PLAYER_RECOVER_INJURY, millis=500, loops=1)
 
@@ -476,7 +476,6 @@ class Game:
                 self.stage = 'init_first_game'
 
     def player_shoot(self):
-        print(self.super_time_secs_left)
         if self.super_time_secs_left > 0:
             self.SFX_SHOT.play()
             bullet = Bullet(self.IMG_POOP, self)
