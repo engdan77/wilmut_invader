@@ -260,6 +260,7 @@ class Game:
         self.screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
 
         # Adding GAME_PATH to ensure work regardless running as package using e.g. UV or a script, rather than using CWD
+        print('Current game path: ' + GAME_PATH)
         self.BG_IMAGE = pygame.image.load(GAME_PATH + '/img/background.png')
         self.BG_INTRO = pygame.image.load(GAME_PATH + '/img/intro.png').convert()
         self.BG_GAME_OVER = pygame.image.load(GAME_PATH + '/img/game_over.png').convert()
