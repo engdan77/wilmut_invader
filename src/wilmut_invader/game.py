@@ -151,8 +151,9 @@ class Item(pygame.sprite.Sprite):
         elif self.item_type == ItemType.SUPER and self.game.super_time_secs_left < 1:
             self.game.super_time_secs_left = 30
             self.game.player.become_super()
-            pygame.time.set_timer(EVENT_DECREASE_TIME_SUPER, millis=1000, loops=30)
-            pygame.time.set_timer(EVENT_RESTORE_USER, millis=30000, loops=1)
+            # TODO: Below possibly broken with older version, where loops is in the past "once" True or False
+            pygame.time.set_timer(EVENT_DECREASE_TIME_SUPER, 1000, 30)
+            pygame.time.set_timer(EVENT_RESTORE_USER, 30000, 1)
 
         self.game.item_scheduled = False
 
@@ -177,7 +178,7 @@ class Player(pygame.sprite.Sprite):
         color_image = pygame.Surface(self.image.get_size()).convert_alpha()
         color_image.fill((250, 0, 0))
         self.image.blit(color_image, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
-        pygame.time.set_timer(EVENT_PLAYER_RECOVER_INJURY, millis=500, loops=1)
+        pygame.time.set_timer(EVENT_PLAYER_RECOVER_INJURY, 500, 1)
 
     def restore_player(self):
         self.image = self.org_image.copy()
@@ -330,7 +331,7 @@ class Game:
         start_music()
         self.stage = 'run_first_game'
 
-        pygame.time.set_timer(EVENT_SPEEDUP_ENEMIES, millis=15000, loops=0)
+        pygame.time.set_timer(EVENT_SPEEDUP_ENEMIES, 15000, 0)
 
     def create_falling_enemy(self, image=None):
         if not image:
@@ -449,12 +450,12 @@ class Game:
 
         if self.lives < 1 and not self.game_over_scheduled:
             self.game_over_scheduled = True
-            pygame.time.set_timer(EVENT_GAME_OVER, millis=1000, loops=1)
+            pygame.time.set_timer(EVENT_GAME_OVER, 1000, 1)
 
         # Ensure new items get created
         if not self.item_scheduled:
             self.item_scheduled = True
-            pygame.time.set_timer(EVENT_CREATE_ITEM, millis=random.randint(5000, 10000), loops=1)
+            pygame.time.set_timer(EVENT_CREATE_ITEM, random.randint(5000, 10000), 1)
 
         pygame.display.update()
 
