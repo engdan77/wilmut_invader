@@ -11,7 +11,7 @@ import sys
 import pygame
 import random
 
-__version__ = '2025.2.7'
+__version__ = '2025.2.8'
 
 PYGAME_VERSION = pygame.version.ver
 
@@ -87,9 +87,6 @@ class Enemy(pygame.sprite.Sprite):
         self.pos_x = self.rect.x
 
     def reset_pos(self):
-        """ Reset position to the top of the screen, at a random x location.
-        Called by update() or the main program loop if there is a collision.
-        """
         self.rect.y = random.randrange(-1200, -20)
         self.rect.x = random.randrange(0, SCREEN_WIDTH)
 
@@ -109,7 +106,7 @@ class Enemy(pygame.sprite.Sprite):
 
 
 class Item(pygame.sprite.Sprite):
-    """ This class represents the block. """
+    """ This class represents the item. """
 
     def __init__(self, game, item_velocity=0.5, item_type=ItemType.SLIME):
         if PY2:
@@ -154,13 +151,11 @@ class Item(pygame.sprite.Sprite):
         elif self.item_type == ItemType.LIFE:
             if self.game.lives < 5:
                 self.game.lives += 1
-        elif self.item_type == ItemType.SUPER and self.game.super_time_secs_left < 1:
+        elif self.item_type == ItemType.SUPER and self.game.super_time_secs_left == 0:
             self.game.super_time_secs_left = 30
             self.game.player.become_super()
-            # TODO: Below possibly broken with older version, where loops is in the past "once" True or False
             pygame.time.set_timer(EVENT_DECREASE_TIME_SUPER, 1000)
-            pygame.time.set_timer(EVENT_RECOVER_USER, 30000)
-
+            pygame.time.set_timer(EVENT_PLAYER_BECOME_NORMAL, 30000)
         self.game.item_scheduled = False
 
 
@@ -178,6 +173,7 @@ class Player(pygame.sprite.Sprite):
         self.image.set_colorkey((0, 0, 0, 255))
         self.rect = self.image.get_rect()
         self.change_x = 0
+        self.added_velocity = 0
 
     def injury(self):
         self.game.SFX_OUCH.play()
@@ -185,22 +181,30 @@ class Player(pygame.sprite.Sprite):
         color_image.fill((250, 0, 0))
         self.image.blit(color_image, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
         pygame.time.set_timer(EVENT_PLAYER_RECOVER_INJURY, 500)
+        print('Injury')
 
     def restore_player_from_injury(self):
+        if self.game.super_time_secs_left > 0:
+            return
         self.image = self.org_image.copy()
         self.image.set_colorkey((0, 0, 0, 255))
-        pygame.time.set_timer(EVENT_RECOVER_USER, 0)
+        pygame.time.set_timer(EVENT_PLAYER_RECOVER_INJURY, 0)
+        print('Restore from injury')
 
     def player_become_normal(self):
+        pygame.time.set_timer(EVENT_PLAYER_BECOME_NORMAL, 0)
+        self.added_velocity = 0
         self.image = self.org_image.copy()
         self.image.set_colorkey((0, 0, 0, 255))
-        pygame.time.set_timer(EVENT_PLAYER_BECOME_NORMAL, 0)
+        print('Became normal')
 
     def become_super(self):
+        self.game.SFX_SUPER.play()
+        self.added_velocity = 2
         color_image = pygame.Surface(self.image.get_size()).convert_alpha()
         color_image.fill((0, 196, 0))
         self.image.blit(color_image, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
-        # pygame.time.set_timer(EVENT_PLAYER_RECOVER_INJURY, millis=500, loops=1)
+        print('Became super')
 
     def update(self):
         self.rect.x += self.change_x
@@ -213,10 +217,10 @@ class Player(pygame.sprite.Sprite):
             self.change_x = 0
 
     def go_left(self):
-        self.change_x = -2 * self.game.pace
+        self.change_x = (-2 - self.added_velocity) * self.game.pace
 
     def go_right(self):
-        self.change_x = 2 * self.game.pace
+        self.change_x = (2 + self.added_velocity) * self.game.pace
 
 
 class Bullet(pygame.sprite.Sprite):
@@ -292,7 +296,10 @@ class Game:
         self.IMG_EXTRA_SUPER = pygame.image.load(GAME_PATH + '/img/superw.png').convert_alpha()
 
         self.SFX_SHOT = pygame.mixer.Sound(GAME_PATH + "/sfx/fart.ogg")
+        self.SFX_BIG_SHOT = pygame.mixer.Sound(GAME_PATH + "/sfx/bigfart.ogg")
+        self.SFX_SUPER = pygame.mixer.Sound(GAME_PATH + "/sfx/powerup.ogg")
         self.SFX_OUCH = pygame.mixer.Sound(GAME_PATH + "/sfx/ouch.ogg")
+        self.SFX_GAME_OVER = pygame.mixer.Sound(GAME_PATH + "/sfx/gameover.ogg")
         self.OH_NO = pygame.mixer.Sound(GAME_PATH + "/sfx/oh_no.ogg")
         self.SFX_LETS_GO = pygame.mixer.Sound(GAME_PATH + "/sfx/lets_go.ogg")
         self.score_font = pygame.font.Font(GAME_PATH + '/fonts/my.ttf', 60)
@@ -480,6 +487,8 @@ class Game:
         pygame.display.update()
 
     def game_over(self, events):
+        if self.game_over_scheduled:
+            self.SFX_GAME_OVER.play()
         self.game_over_scheduled = False
         self.enemy_speedup_factor = 0
         self.screen.fill(BLACK)
@@ -499,7 +508,7 @@ class Game:
 
     def player_shoot(self):
         if self.super_time_secs_left > 0:
-            self.SFX_SHOT.play()
+            self.SFX_BIG_SHOT.play()
             bullet = Bullet(self.IMG_POOP, self)
             bullet.rect.x = self.player.rect.x + 30
             bullet.rect.y = self.player.rect.y - 30
@@ -525,7 +534,7 @@ class Game:
     def draw_scores(self):
         # Put scores
         text_surface = self.score_font.render(str(self.score), True, (255, 0, 0))
-        self.screen.blit(text_surface, (SCREEN_WIDTH - 150, 5))
+        self.screen.blit(text_surface, (SCREEN_WIDTH - 200, 5))
 
     def draw_lives(self):
         life = self.IMG_HEART
@@ -557,7 +566,7 @@ class Game:
         self.super_time_secs_left -= 1
         if self.super_time_secs_left <= 0:
             pygame.time.set_timer(EVENT_DECREASE_TIME_SUPER, 0)
-            pygame.time.set_timer(EVENT_PLAYER_BECOME_NORMAL, 500)
+            pygame.time.set_timer(EVENT_PLAYER_BECOME_NORMAL, 1000)
 
     def tick(self):
         # Pace is based on ratio from optimal duration, e.g. pase = 1 = perfect, pase = 0.5 = half speed
