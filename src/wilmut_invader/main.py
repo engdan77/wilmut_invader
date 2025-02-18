@@ -25,14 +25,13 @@ def py2to3(code):
 
 
 def get_namespace_from_source(file='game.py', python2=False):
-    source_dir = os.path.dirname(__file__)
-    game_file = os.path.join(source_dir, 'game.py')
+    source_dir = os.path.dirname(os.path.abspath(__file__))
+    game_file = os.path.join(source_dir, file)
     source_code = open(game_file).read()
     if python2:
         source_code = py2to3(source_code)
-    ns = {}
-    game_path = os.path.dirname(__file__)
-    ns['GAME_PATH'] = game_path
+    ns = dict()
+    ns['GAME_PATH'] = source_dir
     exec(source_code, ns)
     return ns
 
