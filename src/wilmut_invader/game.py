@@ -13,6 +13,8 @@ import random
 
 __version__ = '2025.2.6'
 
+PYGAME_VERSION = pygame.version.ver
+
 PY2 = int(sys.version.split('.').pop(0)) == 2
 
 DEBUG = True
@@ -529,7 +531,7 @@ class Game:
 
     def draw_debug(self):
         fps = int(self.clock.get_fps())
-        text = __version__ + ' FPS: ' + str(fps)
+        text = __version__ + ' [' + PYGAME_VERSION + '] FPS: ' + str(fps)
         text_surface = self.debug_font.render(text, True, (0, 0, 0))
         self.screen.blit(text_surface, (5, 2))
 
