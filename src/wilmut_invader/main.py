@@ -8,6 +8,7 @@ import sys
 import os
 import traceback
 from datetime import datetime
+import pygame
 
 
 def py2to3(code):
@@ -63,6 +64,7 @@ def start():
         try:
             ns['game_loop']()
         except Exception as err:
+            pygame_version = pygame.version.ver
             source_dir = get_source_dir()
             error_class = err.__class__.__name__
             detail = err.args[0]
@@ -72,7 +74,7 @@ def start():
             print('Writing crash report to ' + fn + ' ...')
             with open(fn, 'w') as f:
                 now = datetime.now()
-                for line in (str(now), 'error: ' + error_class, detail, 'line: ' + str(line_number)):
+                for line in (str(now), 'error: ' + error_class, detail, 'line: ' + str(line_number), 'pygame: ' + pygame_version):
                     f.write(line + '\n')
 
 
