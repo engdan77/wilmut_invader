@@ -44,7 +44,7 @@ def start():
     try:
         print('Changing into game directory')
         os.chdir('src/wilmut_invader')
-    except FileNotFoundError:
+    except OSError:
         pass
     python_version = int(sys.version.split('.').pop(0))
     if python_version == 3:
