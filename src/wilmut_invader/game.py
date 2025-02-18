@@ -11,7 +11,7 @@ import sys
 import pygame
 import random
 
-__version__ = '2025.2.6'
+__version__ = '2025.2.7'
 
 PYGAME_VERSION = pygame.version.ver
 
@@ -27,12 +27,13 @@ BLUE = (0, 0, 255)
 SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 480
 
-EVENT_RESTORE_USER = 4
-EVENT_DECREASE_TIME_SUPER = 8
-EVENT_SPEEDUP_ENEMIES = 16
-EVENT_PLAYER_RECOVER_INJURY = 32
-EVENT_GAME_OVER = 64
-EVENT_CREATE_ITEM = 128
+EVENT_RECOVER_USER = pygame.USEREVENT + 1
+EVENT_DECREASE_TIME_SUPER = pygame.USEREVENT + 2
+EVENT_SPEEDUP_ENEMIES = pygame.USEREVENT + 3
+EVENT_PLAYER_RECOVER_INJURY = pygame.USEREVENT + 4
+EVENT_GAME_OVER = pygame.USEREVENT + 5
+EVENT_CREATE_ITEM = pygame.USEREVENT + 6
+EVENT_PLAYER_BECOME_NORMAL = pygame.USEREVENT + 7
 
 FPS = 60
 OPTIMAL_MS_PER_TICK = int(1000 / FPS)
@@ -98,10 +99,13 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.x = self.pos_x
 
         if self.pos_y > SCREEN_HEIGHT - 10:
-            self.game.lives -= 1
             self.game.enemy_list.remove(self)
             self.game.all_sprites_list.remove(self)
-            self.game.player.injury()
+            if self.game.super_time_secs_left > 0:
+                return
+            else:
+                self.game.lives -= 1
+                self.game.player.injury()
 
 
 class Item(pygame.sprite.Sprite):
@@ -154,8 +158,8 @@ class Item(pygame.sprite.Sprite):
             self.game.super_time_secs_left = 30
             self.game.player.become_super()
             # TODO: Below possibly broken with older version, where loops is in the past "once" True or False
-            pygame.time.set_timer(EVENT_DECREASE_TIME_SUPER, 1000, 30)
-            pygame.time.set_timer(EVENT_RESTORE_USER, 30000, 1)
+            pygame.time.set_timer(EVENT_DECREASE_TIME_SUPER, 1000)
+            pygame.time.set_timer(EVENT_RECOVER_USER, 30000)
 
         self.game.item_scheduled = False
 
@@ -180,15 +184,21 @@ class Player(pygame.sprite.Sprite):
         color_image = pygame.Surface(self.image.get_size()).convert_alpha()
         color_image.fill((250, 0, 0))
         self.image.blit(color_image, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
-        pygame.time.set_timer(EVENT_PLAYER_RECOVER_INJURY, 500, 1)
+        pygame.time.set_timer(EVENT_PLAYER_RECOVER_INJURY, 500)
 
-    def restore_player(self):
+    def restore_player_from_injury(self):
         self.image = self.org_image.copy()
         self.image.set_colorkey((0, 0, 0, 255))
+        pygame.time.set_timer(EVENT_RECOVER_USER, 0)
+
+    def player_become_normal(self):
+        self.image = self.org_image.copy()
+        self.image.set_colorkey((0, 0, 0, 255))
+        pygame.time.set_timer(EVENT_PLAYER_BECOME_NORMAL, 0)
 
     def become_super(self):
         color_image = pygame.Surface(self.image.get_size()).convert_alpha()
-        color_image.fill((0, 64, 0))
+        color_image.fill((0, 196, 0))
         self.image.blit(color_image, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
         # pygame.time.set_timer(EVENT_PLAYER_RECOVER_INJURY, millis=500, loops=1)
 
@@ -333,7 +343,7 @@ class Game:
         start_music()
         self.stage = 'run_first_game'
 
-        pygame.time.set_timer(EVENT_SPEEDUP_ENEMIES, 15000, 0)
+        pygame.time.set_timer(EVENT_SPEEDUP_ENEMIES, 15000)
         # TODO: Need to resolve this compatible with pygame 1.9.2a0, expects 2 args
 
     def create_falling_enemy(self, image=None):
@@ -350,6 +360,7 @@ class Game:
         return enemy
 
     def create_falling_item(self):
+        pygame.time.set_timer(EVENT_CREATE_ITEM, 0)
         self.item_scheduled = False
         velocity = random.randint(40, 60) / 100
         random_pick = random.randint(1, 100)
@@ -396,8 +407,9 @@ class Game:
                 else:
                     self.player_shoot()
             elif event.type == EVENT_PLAYER_RECOVER_INJURY:
-                self.player.restore_player()
+                self.player.restore_player_from_injury()
             elif event.type == EVENT_GAME_OVER:
+                pygame.time.set_timer(EVENT_GAME_OVER, 0)
                 self.stage = 'game_over'
             elif event.type == EVENT_CREATE_ITEM:
                 item = self.create_falling_item()
@@ -410,8 +422,10 @@ class Game:
             elif event.type == EVENT_SPEEDUP_ENEMIES:
                 random_factor = random.randint(5, 20) / 100
                 self.enemy_speedup_factor += random_factor
-            elif event.type == EVENT_RESTORE_USER:
-                self.player.restore_player()
+            elif event.type == EVENT_RECOVER_USER:
+                self.player.restore_player_from_injury()
+            elif event.type == EVENT_PLAYER_BECOME_NORMAL:
+                self.player.player_become_normal()
 
         self.all_sprites_list.update()
         for bullet in self.bullet_list:
@@ -453,12 +467,12 @@ class Game:
 
         if self.lives < 1 and not self.game_over_scheduled:
             self.game_over_scheduled = True
-            pygame.time.set_timer(EVENT_GAME_OVER, 1000, 1)
+            pygame.time.set_timer(EVENT_GAME_OVER, 1000)
 
         # Ensure new items get created
         if not self.item_scheduled:
             self.item_scheduled = True
-            pygame.time.set_timer(EVENT_CREATE_ITEM, random.randint(5000, 10000), 1)
+            pygame.time.set_timer(EVENT_CREATE_ITEM, random.randint(5000, 10000))
 
         pygame.display.update()
 
@@ -538,6 +552,9 @@ class Game:
 
     def decrease_super_time_left(self):
         self.super_time_secs_left -= 1
+        if self.super_time_secs_left <= 0:
+            pygame.time.set_timer(EVENT_DECREASE_TIME_SUPER, 0)
+            pygame.time.set_timer(EVENT_PLAYER_BECOME_NORMAL, 500)
 
     def tick(self):
         # Pace is based on ratio from optimal duration, e.g. pase = 1 = perfect, pase = 0.5 = half speed
