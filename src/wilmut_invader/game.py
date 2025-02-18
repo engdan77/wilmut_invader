@@ -270,7 +270,10 @@ class Game:
         self.enemy_speedup_factor = 0
         self.super_time_secs_left = 0
 
-        self.screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
+        if sys.platform == 'darwin':
+            self.screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT], pygame.SCALED | pygame.FULLSCREEN)
+        else:
+            self.screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
 
         # Adding GAME_PATH to ensure work regardless running as package using e.g. UV or a script, rather than using CWD
         print('Current game path: ' + GAME_PATH)
