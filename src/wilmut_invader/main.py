@@ -6,6 +6,8 @@
 # ///
 import sys
 import os
+import traceback
+from datetime import datetime
 
 
 def py2to3(code):
@@ -24,8 +26,12 @@ def py2to3(code):
     return '\n'.join(output_lines)
 
 
+def get_source_dir():
+    return os.path.dirname(os.path.abspath(__file__))
+
+
 def get_namespace_from_source(file='game.py', python2=False):
-    source_dir = os.path.dirname(os.path.abspath(__file__))
+    source_dir = get_source_dir()
     game_file = os.path.join(source_dir, file)
     source_code = open(game_file).read()
     if python2:
@@ -54,7 +60,20 @@ def start():
     else:
         print('Starting Python 2 version')
         ns = get_namespace_from_source('game.py', python2=True)
-        ns['game_loop']()
+        try:
+            ns['game_loop']()
+        except Exception as err:
+            source_dir = get_source_dir()
+            error_class = err.__class__.__name__
+            detail = err.args[0]
+            cl, exc, tb = sys.exc_info()
+            line_number = traceback.extract_tb(tb)[-1][1]
+            fn = source_dir + '/crash_report.log'
+            print('Writing crash report to ' + fn + ' ...')
+            with open(fn, 'w') as f:
+                now = datetime.now()
+                for line in (str(now), 'error: ' + error_class, detail, 'line: ' + str(line_number)):
+                    f.write(line + '\n')
 
 
 if __name__ == '__main__':
