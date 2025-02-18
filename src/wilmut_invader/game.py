@@ -334,6 +334,7 @@ class Game:
         self.stage = 'run_first_game'
 
         pygame.time.set_timer(EVENT_SPEEDUP_ENEMIES, 15000, 0)
+        # TODO: Need to resolve this compatible with pygame 1.9.2a0, expects 2 args
 
     def create_falling_enemy(self, image=None):
         if not image:
