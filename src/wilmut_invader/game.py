@@ -181,7 +181,6 @@ class Player(pygame.sprite.Sprite):
         color_image.fill((250, 0, 0))
         self.image.blit(color_image, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
         pygame.time.set_timer(EVENT_PLAYER_RECOVER_INJURY, 500)
-        print('Injury')
 
     def restore_player_from_injury(self):
         if self.game.super_time_secs_left > 0:
@@ -189,14 +188,12 @@ class Player(pygame.sprite.Sprite):
         self.image = self.org_image.copy()
         self.image.set_colorkey((0, 0, 0, 255))
         pygame.time.set_timer(EVENT_PLAYER_RECOVER_INJURY, 0)
-        print('Restore from injury')
 
     def player_become_normal(self):
         pygame.time.set_timer(EVENT_PLAYER_BECOME_NORMAL, 0)
         self.added_velocity = 0
         self.image = self.org_image.copy()
         self.image.set_colorkey((0, 0, 0, 255))
-        print('Became normal')
 
     def become_super(self):
         self.game.SFX_SUPER.play()
@@ -204,7 +201,6 @@ class Player(pygame.sprite.Sprite):
         color_image = pygame.Surface(self.image.get_size()).convert_alpha()
         color_image.fill((0, 196, 0))
         self.image.blit(color_image, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
-        print('Became super')
 
     def update(self):
         self.rect.x += self.change_x
