@@ -43,8 +43,22 @@ LIVES = 5
 
 BASE_ENEMY_VELOCITY = 0.3  # Adjust to speed up the base speed
 
+LOGGING = True
+SCALED = False
+
+GAME_PATH = os.getcwd()
 if 'GAME_PATH' not in globals():
     GAME_PATH = os.path.dirname(os.path.realpath(__file__))
+
+if os.path.exists(GAME_PATH + '/log.txt'):
+    os.unlink(GAME_PATH + '/log.txt')
+
+
+def write_log(msg):
+    if not LOGGING:
+        return
+    with open(GAME_PATH + '/log.txt', 'a') as f:
+        f.write(msg + '\n')
 
 
 class ItemType:
@@ -127,6 +141,8 @@ class Item(pygame.sprite.Sprite):
         self.item_velocity = item_velocity
         self.pos_y = self.rect.y
         self.pos_x = self.rect.x
+        write_log('Item created: ' + str(item_type))
+        self.item_log_counter = 0
         self.reset_pos()
 
     def reset_pos(self):
@@ -134,11 +150,18 @@ class Item(pygame.sprite.Sprite):
         self.rect.x = random.randint(50, SCREEN_WIDTH-50)
         self.pos_y = self.rect.y
         self.pos_x = self.rect.x
+        self.item_log_counter += 1
+        if self.item_log_counter % 10 == 0:
+            write_log('Item pos: ' + str(self.pos_x) + ', ' + str(self.pos_y))
 
     def update(self):
         self.pos_y += self.game.pace * self.item_velocity
         self.rect.y = self.pos_y
         self.rect.x = self.pos_x
+
+        self.item_log_counter += 1
+        if self.item_log_counter % 100 == 0:
+            write_log('Item updated pos: ' + str(self.pos_x) + ', ' + str(self.pos_y))
 
         if self.pos_y > SCREEN_HEIGHT - 10:
             self.game.item_list.remove(self)
@@ -270,7 +293,7 @@ class Game:
         self.enemy_speedup_factor = 0
         self.super_time_secs_left = 0
 
-        if sys.platform == 'darwin':
+        if sys.platform == 'darwin' and SCALED:
             self.screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT], pygame.SCALED | pygame.FULLSCREEN)
         else:
             self.screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
