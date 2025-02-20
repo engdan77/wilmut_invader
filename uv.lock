@@ -226,7 +226,7 @@ wheels = [
 
 [[package]]
 name = "wilmut-invader"
-version = "2025.2.5"
+version = "2025.2.8"
 source = { editable = "." }
 dependencies = [
     { name = "fpdf2" },

@@ -11,7 +11,7 @@ import sys
 import pygame
 import random
 
-__version__ = '2025.2.8'
+__version__ = '2025.2.9'
 
 PYGAME_VERSION = pygame.version.ver
 
@@ -49,15 +49,17 @@ SCALED = False
 GAME_PATH = os.getcwd()
 if 'GAME_PATH' not in globals():
     GAME_PATH = os.path.dirname(os.path.realpath(__file__))
+LOG_FILE = GAME_PATH + '/log.txt'
 
-if os.path.exists(GAME_PATH + '/log.txt'):
-    os.unlink(GAME_PATH + '/log.txt')
+if os.path.exists(LOG_FILE):
+    os.unlink(LOG_FILE)
 
 
 def write_log(msg):
+    print(msg)
     if not LOGGING:
         return
-    with open(GAME_PATH + '/log.txt', 'a') as f:
+    with open(LOG_FILE, 'a') as f:
         f.write(msg + '\n')
 
 
@@ -143,6 +145,13 @@ class Item(pygame.sprite.Sprite):
         self.pos_x = self.rect.x
         write_log('Item created: ' + str(item_type))
         self.item_log_counter = 0
+        # TODO: On slow devices this probably is not found needed, but keeping this for now.
+        move_pixels_down = int(self.game.pace * self.item_velocity)
+        if move_pixels_down < 1:
+            self.move_pixels_down = 1
+        else:
+            self.move_pixels_down = move_pixels_down
+
         self.reset_pos()
 
     def reset_pos(self):
@@ -150,18 +159,12 @@ class Item(pygame.sprite.Sprite):
         self.rect.x = random.randint(50, SCREEN_WIDTH-50)
         self.pos_y = self.rect.y
         self.pos_x = self.rect.x
-        self.item_log_counter += 1
-        if self.item_log_counter % 10 == 0:
-            write_log('Item pos: ' + str(self.pos_x) + ', ' + str(self.pos_y))
 
     def update(self):
-        self.pos_y += self.game.pace * self.item_velocity
+        # Fall down calculated pixels down
+        self.pos_y += self.move_pixels_down
         self.rect.y = self.pos_y
         self.rect.x = self.pos_x
-
-        self.item_log_counter += 1
-        if self.item_log_counter % 100 == 0:
-            write_log('Item updated pos: ' + str(self.pos_x) + ', ' + str(self.pos_y))
 
         if self.pos_y > SCREEN_HEIGHT - 10:
             self.game.item_list.remove(self)
@@ -299,7 +302,7 @@ class Game:
             self.screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
 
         # Adding GAME_PATH to ensure work regardless running as package using e.g. UV or a script, rather than using CWD
-        print('Current game path: ' + GAME_PATH)
+        write_log('Current game path: ' + GAME_PATH)
         self.BG_IMAGE = pygame.image.load(GAME_PATH + '/img/background.png')
         self.BG_INTRO = pygame.image.load(GAME_PATH + '/img/intro.png').convert()
         self.BG_GAME_OVER = pygame.image.load(GAME_PATH + '/img/game_over.png').convert()
