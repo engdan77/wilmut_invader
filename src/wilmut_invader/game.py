@@ -11,7 +11,7 @@ import sys
 import pygame
 import random
 
-__version__ = '2025.2.9'
+__version__ = '2025.2.10'
 
 PYGAME_VERSION = pygame.version.ver
 
@@ -303,7 +303,7 @@ class Game:
 
         # Adding GAME_PATH to ensure work regardless running as package using e.g. UV or a script, rather than using CWD
         write_log('Current game path: ' + GAME_PATH)
-        self.BG_IMAGE = pygame.image.load(GAME_PATH + '/img/background.png')
+        self.BG_IMAGE = pygame.image.load(GAME_PATH + '/img/background.png').convert()
         self.BG_INTRO = pygame.image.load(GAME_PATH + '/img/intro.png').convert()
         self.BG_GAME_OVER = pygame.image.load(GAME_PATH + '/img/game_over.png').convert()
         self.IMG_WILMA = pygame.image.load(GAME_PATH + '/img/wilma.png').convert()
