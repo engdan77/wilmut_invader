@@ -11,7 +11,7 @@ import sys
 import pygame
 import random
 
-__version__ = '2025.2.10'
+__version__ = '2025.2.11'
 
 PYGAME_VERSION = pygame.version.ver
 
@@ -143,7 +143,6 @@ class Item(pygame.sprite.Sprite):
         self.item_velocity = item_velocity
         self.pos_y = self.rect.y
         self.pos_x = self.rect.x
-        write_log('Item created: ' + str(item_type))
         self.item_log_counter = 0
         # TODO: On slow devices this probably is not found needed, but keeping this for now.
         move_pixels_down = int(self.game.pace * self.item_velocity)
@@ -375,7 +374,7 @@ class Game:
         start_music()
         self.stage = 'run_first_game'
 
-        pygame.time.set_timer(EVENT_SPEEDUP_ENEMIES, 15000)
+        pygame.time.set_timer(EVENT_SPEEDUP_ENEMIES, 10000)
         # TODO: Need to resolve this compatible with pygame 1.9.2a0, expects 2 args
 
     def create_falling_enemy(self, image=None):
@@ -400,9 +399,9 @@ class Game:
         # 80% chance nothing
         if 0 <= random_pick <= 40:
             item_type = ItemType.SLIME
-        elif 40 <= random_pick <= 50:
+        elif 40 <= random_pick <= 60:
             item_type = ItemType.LIFE
-        elif 50 <= random_pick <= 99:
+        elif 60 <= random_pick <= 80:
             item_type = ItemType.SUPER
         else:
             return None
@@ -452,7 +451,7 @@ class Game:
             elif event.type == EVENT_DECREASE_TIME_SUPER:
                 self.decrease_super_time_left()
             elif event.type == EVENT_SPEEDUP_ENEMIES:
-                random_factor = random.randint(5, 20) / 100
+                random_factor = random.randint(10, 30) / 100
                 self.enemy_speedup_factor += random_factor
             elif event.type == EVENT_RECOVER_USER:
                 self.player.restore_player_from_injury()
