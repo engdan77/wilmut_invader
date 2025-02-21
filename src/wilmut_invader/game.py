@@ -70,21 +70,6 @@ class ItemType:
     SUPER = 3
 
 
-class Block(pygame.sprite.Sprite):
-    """ This class represents the block. """
-
-    def __init__(self, color):
-        if PY2:
-            super(Block, self).__init__()
-        else:
-            super().__init__()
-
-        self.image = pygame.Surface([20, 15])
-        self.image.fill(color)
-
-        self.rect = self.image.get_rect()
-
-
 class Enemy(pygame.sprite.Sprite):
     """ This class represents the block. """
 
