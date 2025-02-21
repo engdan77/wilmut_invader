@@ -45,7 +45,7 @@ LIVES = 5
 BASE_ENEMY_VELOCITY = 0.3  # Adjust to speed up the base speed
 
 LOGGING = True
-SCALED = False
+SCALED = True
 
 GAME_PATH = os.getcwd()
 if 'GAME_PATH' not in globals():
