@@ -61,6 +61,7 @@ def start():
         print('Starting Python 3 version')
         import asyncio
         ns = get_namespace_from_source('game.py', python2=False)
+        print('Game path after import: ' + ns['GAME_PATH'])
         asyncio.run(ns['game_loop']())
     else:
         print('Starting Python 2 version')
