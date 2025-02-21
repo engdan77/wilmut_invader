@@ -60,9 +60,17 @@ def start():
     if python_version == 3:
         print('Starting Python 3 version')
         import asyncio
+        from pathlib import Path
         ns = get_namespace_from_source('game.py', python2=False)
         print('Game path after import: ' + ns['GAME_PATH'])
-        asyncio.run(ns['game_loop']())
+        for _ in range(2):
+            try:
+                asyncio.run(ns['game_loop']())
+                break
+            except FileNotFoundError as e:
+                # In such case run as a package rather than a module/script
+                print(e)
+                ns['GAME_PATH'] = Path(__file__).parent.as_posix()
     else:
         print('Starting Python 2 version')
         ns = get_namespace_from_source('game.py', python2=True)
