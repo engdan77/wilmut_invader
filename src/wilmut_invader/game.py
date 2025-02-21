@@ -11,7 +11,7 @@ import sys
 import pygame
 import random
 
-__version__ = '2025.2.11'
+__version__ = '2025.2.12'
 __email__ = 'daniel@engvalls.eu'
 
 PYGAME_VERSION = pygame.version.ver
@@ -97,8 +97,8 @@ class Enemy(pygame.sprite.Sprite):
         self.image = image
         self.image.set_colorkey((0, 0, 0, 255))
         self.rect = self.image.get_rect()
-        random_extra_speed_factor = (random.randint(1, 30) / 100) + 1
-        game_enemy_velocity = self.game.enemy_speedup_factor + 1
+        random_extra_speed_factor = (random.randint(1, 30) / 100) + float(1)  # Making it compatible with Python 2.7
+        game_enemy_velocity = float(self.game.enemy_speedup_factor) + float(1)
         self.enemy_velocity = BASE_ENEMY_VELOCITY * random_extra_speed_factor * game_enemy_velocity
         self.pos_y = self.rect.y
         self.pos_x = self.rect.x
@@ -293,7 +293,8 @@ class Game:
         self.stage = 'intro'
         self.game_over_scheduled = False
         self.item_scheduled = False
-        self.enemy_speedup_factor = 0
+        self.enemy_speedup_factor = float(0)
+        self.upper_floor_speedup_factor = 10
         self.super_time_secs_left = 0
 
         if sys.platform == 'darwin' and SCALED:
@@ -375,7 +376,7 @@ class Game:
         start_music()
         self.stage = 'run_first_game'
 
-        pygame.time.set_timer(EVENT_SPEEDUP_ENEMIES, 10000)
+        pygame.time.set_timer(EVENT_SPEEDUP_ENEMIES, 15000)
         # TODO: Need to resolve this compatible with pygame 1.9.2a0, expects 2 args
 
     def create_falling_enemy(self, image=None):
@@ -400,9 +401,9 @@ class Game:
         # 80% chance nothing
         if 0 <= random_pick <= 40:
             item_type = ItemType.SLIME
-        elif 40 <= random_pick <= 60:
+        elif 40 <= random_pick <= 50:
             item_type = ItemType.LIFE
-        elif 60 <= random_pick <= 80:
+        elif 50 <= random_pick <= 60:
             item_type = ItemType.SUPER
         else:
             return None
@@ -452,8 +453,13 @@ class Game:
             elif event.type == EVENT_DECREASE_TIME_SUPER:
                 self.decrease_super_time_left()
             elif event.type == EVENT_SPEEDUP_ENEMIES:
-                random_factor = random.randint(10, 30) / 100
-                self.enemy_speedup_factor += random_factor
+                # Working on making this compatible with 2.7 (floating points), and set a cap for the speed
+                random_factor = float(random.randint(1, self.upper_floor_speedup_factor)) / float(100)
+                self.enemy_speedup_factor += float(self.enemy_speedup_factor) + random_factor
+                if self.enemy_speedup_factor >= 5:
+                    self.enemy_speedup_factor = 1.5
+                if self.upper_floor_speedup_factor >= 3:
+                    self.upper_floor_speedup_factor -= 1
             elif event.type == EVENT_RECOVER_USER:
                 self.player.restore_player_from_injury()
             elif event.type == EVENT_PLAYER_BECOME_NORMAL:
@@ -512,7 +518,7 @@ class Game:
         if self.game_over_scheduled:
             self.SFX_GAME_OVER.play()
         self.game_over_scheduled = False
-        self.enemy_speedup_factor = 0
+        self.enemy_speedup_factor = float(0)
         self.screen.fill(BLACK)
         self.screen.blit(self.BG_GAME_OVER, (0, 0))
         text_surface = self.score_font.render('Score ' + str(self.score), True, (255, 0, 0))

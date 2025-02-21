@@ -53,6 +53,10 @@ def start():
     except OSError:
         pass
     python_version = int(sys.version.split('.').pop(0))
+    source_dir = get_source_dir()
+    crash_fn = source_dir + '/crash_report.log'
+    if os.path.exists(crash_fn):
+        os.unlink(crash_fn)
     if python_version == 3:
         print('Starting Python 3 version')
         import asyncio
@@ -65,14 +69,12 @@ def start():
             ns['game_loop']()
         except Exception as err:
             pygame_version = pygame.version.ver
-            source_dir = get_source_dir()
             error_class = err.__class__.__name__
             detail = err.args[0]
             cl, exc, tb = sys.exc_info()
             line_number = traceback.extract_tb(tb)[-1][1]
-            fn = source_dir + '/crash_report.log'
-            print('Writing crash report to ' + fn + ' ...')
-            with open(fn, 'w') as f:
+            print('Writing crash report to ' + crash_fn + ' ...')
+            with open(crash_fn, 'w') as f:
                 now = datetime.now()
                 for line in (str(now), 'error: ' + error_class, detail, 'line: ' + str(line_number), 'pygame: ' + pygame_version):
                     f.write(line + '\n')
