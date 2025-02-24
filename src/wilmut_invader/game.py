@@ -11,7 +11,7 @@ import sys
 import pygame
 import random
 
-__version__ = '2025.2.13'
+__version__ = '2025.2.14'
 __email__ = 'daniel@engvalls.eu'
 
 PYGAME_VERSION = pygame.version.ver
@@ -282,10 +282,15 @@ class Game:
         self.upper_floor_speedup_factor = 10
         self.super_time_secs_left = 0
 
+        icon = pygame.image.load(GAME_PATH + '/img/icon.png')
+        pygame.display.set_icon(icon)
+
         if sys.platform == 'darwin' and SCALED:
             self.screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT], pygame.SCALED | pygame.FULLSCREEN)
         else:
             self.screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
+
+        pygame.display.set_caption('Wilmut Invader')
 
         # Adding GAME_PATH to ensure work regardless running as package using e.g. UV or a script, rather than using CWD
         write_log('Current game path: ' + GAME_PATH)
