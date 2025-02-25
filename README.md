@@ -1,9 +1,42 @@
-# 👾 Wilmut Invader
+# 👾 Wilmut Invader 👾
 
 _Work in progress_
 
-In the meantime try this out at:
-https://engdan77.github.io/wilmut_invader/
+
+
+<center>🚀 Tap <a href="https://engdan77.github.io/wilmut_invader/">HERE</a> to play the browser version ▶️ </center>
+
+
+
+## The plot of the game
+
+Wilmut living a pieceful life on the mountain referred as "bärget" close to Huskvarna ⛰️.. until the family becomes cursed and she has to use her slime to protect herself 🦠 as the family members multiplies and becomes faster she has to fight 💪🏻 ... 
+
+## How to play
+
+⬅️     Left key to move left.. or click left part of touch screen
+➡️     Right key to move right .. or click right part of touch screen
+☄️     Shoot using spacebar key .. or middle of the touch screen
+
+## Items in game
+
+🟩    Can of slime - gives you additional 30 slime balls as ammunition
+❤️    Heart - gives you additional life
+🟨    Super - will grant powers to throw giant 💩
+
+## How can this game be run
+
+- Handheld [Miyoo](https://miyooofficial.com/) devices (á la GameBoy) running [OnionOS](https://onionui.github.io/)
+- Within modern web-browsers supporting [WebAssembly](https://webassembly.org/features/)
+- As pure native [PyGame](https://www.pygame.org/) easily installable using [UV](https://astral.sh/blog/uv) as package manager
+
+## Background for development
+
+
+
+
+
+
 
 ## Installation
 
