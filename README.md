@@ -30,13 +30,21 @@ Wilmut living a pieceful life on the mountain referred as "bärget" close to Hus
 - Within modern web-browsers supporting [WebAssembly](https://webassembly.org/features/)
 - As pure native [PyGame](https://www.pygame.org/) easily installable using [UV](https://astral.sh/blog/uv) as package manager
 
-## Background for development
+## Videos
 
+....
 
+## Background and reflections
 
+As the daughter turns 10 year old, and loves to play games - saw this cool affordable handheld console [Miyoo Mini V4](https://shorturl.at/wHftG) allow you to run old retro games from Nintendo etc. But thought it would be even cooler to develop a game from scratch and discovered that a ported version of Python 2.7 existed and thought it be a good oportunity put the [PyGame](https://www.pygame.org/) library a test 🤓...
 
+Apparently it turned out to be quite easy, so in 10% of the time put into this I got 90% of everything there .. as with always the remaining 90% of the time those last 10% polishing were put 🤭
 
+What had to be made that probably stands out was to cleverly design the source being compatible with PyGame 1.x running in Python 2.7 as well as PyGame 2.x in more recent Python 3.12 including [async/await](async/await) so that it would allow me use [PygBag](https://pygame-web.github.io/wiki/pygbag/) to compile this game into [WebAssembly](https://en.wikipedia.org/wiki/WebAssembly) that we I could run this game within any modern web browser. This is really awesome .. we can now basically run this game on any device including iPhone if you want to.
 
+Also using [Github Actions](https://github.com/engdan77/wilmut_invader/actions) as [CI/CD](CI/CD) so that on every push it would automatically compile this into a runnable game accessible from https://engdan77.github.io/wilmut_invader/
+
+I also developed a script [build_onionos_port.py](src/wilmut_invader/build_onionos_port.py) that would easily allow me to export this game into SD card you could put into the Miyoo handheld.
 
 ## Installation
 
@@ -56,6 +64,10 @@ uv run src/wilmut_invader/build_onionos_port.py /Volumes/USB/
 
 ## Run the game
 
+### From web
+
+Just go to https://engdan77.github.io/wilmut_invader/
+
 #### From the source
 
 ```shell
@@ -63,8 +75,6 @@ uvx --from git+https://github.com/engdan77/wilmut_invader.git wilmut-invader
 ```
 
 ## Software architecture
-
-Class relationship
 
 ```mermaid
 ---
