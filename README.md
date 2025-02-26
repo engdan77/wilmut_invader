@@ -1,8 +1,6 @@
-# 👾 Wilmut Invader 👾
+# <center>👾 Wilmut Invader 👾</center>
 
-_Work in progress_
-
-
+<img src="https://raw.githubusercontent.com/engdan77/project_images/master/uPic/main_screenshot.png" alt="main_screenshot" style="zoom:50%;" />
 
 <center>🚀 Tap <a href="https://engdan77.github.io/wilmut_invader/">HERE</a> to play the browser version ▶️ </center>
 
