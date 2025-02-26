@@ -38,13 +38,17 @@ Wilmut living a pieceful life on the mountain referred as "bärget" close to Hus
 
 ## Background and reflections
 
-As the daughter turns 10 years old and loves to play games - I saw this cool, affordable handheld console [Miyoo Mini V4, which](https://shorturl.at/wHftG) allows you to run old retro games from Nintendo, etc. But thought it would be even cooler to develop a game from scratch and discovered that a ported version of Python 2.7 existed and thought it would be a good opportunity to put the [PyGame](https://www.pygame.org/) library to test 🤓...
+As the daughter turns 10 years old and loves to play games - I saw this cool, affordable *handheld* console [Miyoo Mini V4](https://shorturl.at/wHftG), which allows you to run old retro games from Nintendo, etc. But thought it would be even cooler to develop a game from scratch and discovered that a ported version of Python 2.7 existed and thought it would be a good opportunity to put the [PyGame](https://www.pygame.org/) library to test 🤓...
+
+<img src="https://raw.githubusercontent.com/engdan77/project_images/master/uPic/miyoo_version.png" alt="miyoo_version" style="zoom:40%;" />
 
 It turned out to be quite easy using [Python](https://www.python.org/) as the programming language, so in 10% of the time put into this, I got 90% of everything there .. as with always the remaining 90% of the time those last 10% polishing was put 🤭
 
 What had to be made that probably stands out was to cleverly design the source to be compatible with PyGame 1.x running in Python 2.7 as well as PyGame 2.x in more recent Python 3.12 including [async/await](async/await) so that it would allow me to use [PygBag](https://pygame-web.github.io/wiki/pygbag/) to compile this game into [WebAssembly](https://en.wikipedia.org/wiki/WebAssembly) that we I could run this game within any modern web browser. This is awesome .. we can now basically run this game on any device including an iPhone if you want to.
 
-Also using [Github Actions](https://github.com/engdan77/wilmut_invader/actions) as [CI/CD](CI/CD) so that on every push it would automatically compile this into a runnable game accessible from https://engdan77.github.io/wilmut_invader/
+<img src="https://raw.githubusercontent.com/engdan77/project_images/master/uPic/browser_version.png" alt="browser_version" style="zoom:50%;" />
+
+Also using [GitHub Actions](https://github.com/engdan77/wilmut_invader/actions) as [CI/CD](CI/CD) so that on every push it would automatically compile this into a runnable game accessible from https://engdan77.github.io/wilmut_invader/
 
 I also developed a script [build_onionos_port.py](src/wilmut_invader/build_onionos_port.py) that would easily allow me to export this game into an <u>SD card</u> you could put into the Miyoo handheld.
 
