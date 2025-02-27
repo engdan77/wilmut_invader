@@ -29,12 +29,16 @@ Wilmut living a pieceful life on the mountain referred as "bärget" close to Hus
 ## How can this game be run?
 
 - Handheld [Miyoo](https://miyooofficial.com/) devices (á la GameBoy) running [OnionOS](https://onionui.github.io/)
-- Within modern web-browsers supporting [WebAssembly](https://webassembly.org/features/)
+- Within modern web browsers supporting [WebAssembly](https://webassembly.org/features/)
 - As pure native [PyGame, it is](https://www.pygame.org/) easily installable using [UV](https://astral.sh/blog/uv) as a package manager
 
-## Videos
+## Video demo
 
-....
+You can watch a video showing this game [here](https://youtu.be/5c9Ts0BukPw) ... 🎬🍿
+
+![wilmut_movie](https://raw.githubusercontent.com/engdan77/project_images/master/uPic/wilmut_movie.gif)
+
+
 
 ## Background and reflections
 
