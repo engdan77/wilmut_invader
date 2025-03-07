@@ -2,35 +2,36 @@
 
 <img src="https://raw.githubusercontent.com/engdan77/project_images/master/uPic/main_screenshot.png" alt="main_screenshot" style="zoom:50%;" />
 
-<center>🚀 Tap <a href="https://engdan77.github.io/wilmut_invader/">HERE</a> to play the browser version ▶️ </center>
+<center>🚀 Tap <a href="https://engdan77.github.io/wilmut_invader/">HERE</a> to play the web browser version (preferably Chrome) ▶️ </center>
 
 
 
 ## The plot of the game
 
-Wilmut living a pieceful life on the mountain referred as "bärget" close to Huskvarna ⛰️.. until the family becomes cursed and she has to use her slime to protect herself 🦠 as the family members multiplies and becomes faster she has to fight 💪🏻 ... 
+Wilmut living a peaceful life on the mountain referred as "bärget" close to Huskvarna ⛰️.. until the family becomes cursed and she has to use her slime to protect herself 🦠 as the family members multiply and becomes faster she has to fight 💪🏻 ... 
 
 ## How to play
 
-⬅️     Left key to move left.. or click the left part of touch touchscreen (e.g. iPhone/Android/tablets)
+⬅️ Use the left key to move left or click the left part of touch touchscreen (e.g. iPhone/Android/tablets)
 
-➡️     Right key to move right .. or click the right part of the touchscreen
+➡️     Right key to move right... or click the right part of the touchscreen
 
 ☄️     Shoot using the spacebar key .. or the middle of the touchscreen
 
 ## Items in game
 
-🟩    Can of slime - gives you an additional 30 slime balls as ammunition
+🟩    Can of slime - Gives you an additional 30 slime balls as ammunition
 
-❤️    Heart - gives you additional life
+❤️    Heart - Gives you additional life
 
-🟨    Super - will grant powers to throw giant 💩
+🟨    Super - Will grant powers to throw giant 💩
 
 ## How can this game be run?
 
 - Handheld [Miyoo](https://miyooofficial.com/) devices (á la GameBoy) running [OnionOS](https://onionui.github.io/)
 - Within modern web browsers supporting [WebAssembly](https://webassembly.org/features/)
-- As pure native [PyGame, it is](https://www.pygame.org/) easily installable using [UV](https://astral.sh/blog/uv) as a package manager
+- As pure native [PyGame](https://www.pygame.org/), it is easily installable using [UV](https://astral.sh/blog/uv) as a package manager
+- Natively as app on Android device (apk)
 
 ## Video demo
 
@@ -48,13 +49,15 @@ As the daughter turns 10 years old and loves to play games - I saw this cool, af
 
 It turned out to be quite easy using [Python](https://www.python.org/) as the programming language, so in 10% of the time put into this, I got 90% of everything there .. as with always the remaining 90% of the time those last 10% polishing was put 🤭
 
-What had to be made that probably stands out was to cleverly design the source to be compatible with PyGame 1.x running in Python 2.7 as well as PyGame 2.x in more recent Python 3.12 including [async/await](async/await) so that it would allow me to use [PygBag](https://pygame-web.github.io/wiki/pygbag/) to compile this game into [WebAssembly](https://en.wikipedia.org/wiki/WebAssembly) that we I could run this game within any modern web browser. This is awesome .. we can now basically run this game on any device including an iPhone if you want to.
+What had to be made that probably stands out was to cleverly design the source to be compatible with PyGame 1.x running in Python 2.7 as well as PyGame 2.x in more recent Python 3.12 including [async/await](async/await) so that it would allow me to use [PygBag](https://pygame-web.github.io/wiki/pygbag/) to compile this game into [WebAssembly](https://en.wikipedia.org/wiki/WebAssembly) that we I could run this game within any modern web browser. This is awesome. We can now basically run this game on any device, including an iPhone if you want to.
 
 <img src="https://raw.githubusercontent.com/engdan77/project_images/master/uPic/browser_version.png" alt="browser_version" width="200" />
 
-Also using [GitHub Actions](https://github.com/engdan77/wilmut_invader/actions) as [CI/CD](CI/CD) so that on every push it would automatically compile this into a runnable game accessible from https://engdan77.github.io/wilmut_invader/
+Also, I am using [GitHub Actions](https://github.com/engdan77/wilmut_invader/actions) as [CI/CD](CI/CD) so that on every push, it would automatically compile this into a runnable game accessible from https://engdan77.github.io/wilmut_invader/
 
 I also developed a script [build_onionos_port.py](src/wilmut_invader/build_onionos_port.py) that would easily allow me to export this game into an <u>SD card</u> you could put into the Miyoo handheld.
+
+On top of this, thanks to [Buildozer, I was](https://buildozer.readthedocs.io/en/latest/) able to cross-compile and package this game to run on Android devices as well. 😄👍
 
 ## Installation
 
@@ -71,19 +74,34 @@ eject and then re-insert into your console.
 uv run src/wilmut_invader/build_onionos_port.py /Volumes/USB/
 ```
 
+### Build Android App (apk)
+
+```she
+cd build_android_apk && bash build_android_app.apk
+
+# To install to device connected via USB
+adb install wilmutinvader-0.1-x86_64_arm64-v8a_armeabi-v7a-debug.apk
+```
+
+
+
 ## Run the game
 
-### From web
+### From web (easiest)
 
 Just go to https://engdan77.github.io/wilmut_invader/
 
-#### From the source
+#### From the source on macOS, Windows, or Linux (no installation required)
+
+Ensure you have the [UV package](https://docs.astral.sh/uv/getting-started/installation/) manager installed.
 
 ```shell
 uvx --from git+https://github.com/engdan77/wilmut_invader.git wilmut-invader
 ```
 
 ## Software architecture
+
+This is a high-level UML over those main pieces of this game .. 
 
 ```mermaid
 ---
