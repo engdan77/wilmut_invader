@@ -74,7 +74,9 @@ eject and then re-insert into your console.
 uv run src/wilmut_invader/build_onionos_port.py /Volumes/USB/
 ```
 
-### Build Android App (apk)
+### Install on Android
+
+##### Build APK yourself
 
 ```she
 cd build_android_apk && bash build_android_app.apk
@@ -83,7 +85,9 @@ cd build_android_apk && bash build_android_app.apk
 adb install wilmutinvader-0.1-x86_64_arm64-v8a_armeabi-v7a-debug.apk
 ```
 
+##### Download pre-built Android APK
 
+You can download from [here](https://www.dropbox.com/scl/fi/uo9vfrbq4az4bi742oyha/wilmutinvader-0.1-x86_64_arm64-v8a_armeabi-v7a-debug.apk?rlkey=qdpxgd185xk4rhv444b4uyl4p&st=pgz98kn2&dl=0).
 
 ## Run the game
 
