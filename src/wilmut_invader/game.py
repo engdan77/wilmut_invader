@@ -285,10 +285,10 @@ class Game:
         icon = pygame.image.load(GAME_PATH + '/img/icon.png')
         pygame.display.set_icon(icon)
 
-        if sys.platform == 'darwin' and SCALED:
-            self.screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT], pygame.SCALED | pygame.FULLSCREEN)
-        else:
+        if PY2:
             self.screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
+        else:
+            self.screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT], pygame.SCALED | pygame.FULLSCREEN)
 
         pygame.display.set_caption('Wilmut Invader')
 
