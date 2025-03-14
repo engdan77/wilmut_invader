@@ -95,7 +95,7 @@ You can download from [here](https://www.dropbox.com/scl/fi/uo9vfrbq4az4bi742oyh
 
 Just go to https://engdan77.github.io/wilmut_invader/
 
-#### From the source on macOS, Windows, or Linux (no installation required)
+### From the source code on macOS, Windows, or Linux (no installation required)
 
 Ensure you have the [UV package](https://docs.astral.sh/uv/getting-started/installation/) manager installed.
 
