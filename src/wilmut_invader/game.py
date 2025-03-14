@@ -285,7 +285,7 @@ class Game:
         icon = pygame.image.load(GAME_PATH + '/img/icon.png')
         pygame.display.set_icon(icon)
 
-        if PY2:
+        if PY2 or sys.platform == "emscripten":
             self.screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
         else:
             self.screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT], pygame.SCALED | pygame.FULLSCREEN)
